@@ -1,0 +1,64 @@
+---
+title: "Influence Models"
+author: "JMR"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+params:
+  influence: ""
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
+influence <- params$influence
+```
+
+```{r output}
+m8a <- glm(post_n ~ 1 +
+             # adoption_tri +
+             # scale(n_tweets) +
+             TF,
+           data = influence,
+           family = 'poisson')
+
+m8b <- glm(post_n ~ 1 +
+             # adoption_tri +
+             # scale(n_tweets) +
+             TS,
+           data = influence,
+           family = 'poisson')
+
+m8c <- glm(post_n ~ 1 +
+             # adoption_tri +
+             # scale(n_tweets) +
+            SB,
+           data = influence,
+           family = 'poisson')
+
+m8d <- glm(post_n ~ 1 +
+             #adoption_tri +
+             scale(TF) + scale(TS) + scale(SB),
+           #group,
+           data = influence,
+           family = 'poisson')
+
+m8e <- glm(post_n ~ 1 +
+             #adoption_tri +
+             scale(TF) + scale(TS) + scale(SB) +
+             group,
+           data = influence,
+           family = 'poisson')
+
+m8f <- glm(post_n ~ 1 +
+             #adoption_tri +
+             scale(TF) + scale(TS) + scale(SB),
+           #group,
+           data = influence,
+           family = 'poisson')
+
+m8a %>% effectsize::standardize_parameters()
+m8b %>% effectsize::standardize_parameters()
+m8c %>% effectsize::standardize_parameters()
+m8f %>% effectsize::standardize_parameters()
+
+sjPlot::tab_model(m8a, m8b, m8c, m8f, show.ci = FALSE, show.std=T, file = "unweighted-final-models.doc")
+```

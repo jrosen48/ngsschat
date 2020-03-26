@@ -1,0 +1,25 @@
+---
+title: "Display Images"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+f <- list.files("img") %>% 
+  str_c("img/", .)
+```
+
+```{r}
+knitr::include_graphics(f[[1]])
+```
+
+```{r}
+knitr::include_graphics(f[[2]])
+```
+
+```{r}
+knitr::include_graphics(f[[3]])
+```

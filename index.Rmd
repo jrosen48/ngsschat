@@ -1,0 +1,20 @@
+---
+title: "#NGSSchat Analysis"
+date: "`r str_c('Updated ', format(Sys.time(), '%d %B, %Y'))`"
+output: html_document
+---
+
+This is for an analysis associated with #NGSSchat on Twitter by:
+
+- Joshua Rosenberg
+- Joshua Reid
+- Elizabeth Dyer
+- Matthew Koehler
+- Christian Fischer
+- T. J. McKenna
+
+Output:
+
+  - [Descriptive Statistics for Threads (RQ #3)](thread-summary.html)
+  - [Influence Models (RQ #4)](influence-models.html)
+  - [Images](display-images.html)

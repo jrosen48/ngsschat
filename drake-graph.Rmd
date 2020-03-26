@@ -1,0 +1,9 @@
+---
+title: "Drake Graph"
+date: "`r str_c('Updated ', format(Sys.time(), '%d %B, %Y'))`"
+output: html_document
+---
+
+```{r, fig.width = 8, fig.height = 8}
+knitr::include_graphics("img/drake-graph.png")
+```

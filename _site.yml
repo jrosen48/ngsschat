@@ -1,0 +1,18 @@
+name: ngsschat_analysis
+output_dir: '.'
+navbar:
+  title: #NGSSchat Analysis
+  left:
+  - text: Home
+    href: index.html
+  - text: Descriptive Statistics for Threads (RQ #3)
+    href: thread-summary.html
+  - text: Influence Models (RQ #4)
+    href: influence-models.html
+  - text: Images
+    href: display-images.html
+  - text: Drake Graph
+    href: drake-graph.html
+
+output:
+  html_document:
