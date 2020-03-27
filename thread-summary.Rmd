@@ -32,7 +32,7 @@ coded_threads %>%
   spread(key, mean_val) %>% 
   ungroup() %>% 
   dplyr::select(Code = code, Teacher, Administrator, Researcher, Organization, Other) %>% 
-  filter(Code != "RT") %>% clipr::write_clip()
+  filter(Code != "RT")
 
 tm <- coded_threads %>% 
   count(ID, group, code) %>% 
