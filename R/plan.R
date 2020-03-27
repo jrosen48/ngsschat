@@ -6,14 +6,14 @@ plan = drake_plan(
   orig_post = read_csv(file_in("data/orig-post-15.csv")),
   edge = read_csv(file_in("data/edgelist-to-analyze.csv")),
   state_data = read_excel(file_in("data/state-data.xlsx")),
-  l = read_rds(file_in("data/geocoded-locations.rds")),
+  locs = read_rds(file_in("data/geocoded-locations.rds")),
   coded_threads = read_csv(file_in("data/qual-coded-tweets.csv")),
   
   ts_plot = create_time_series(orig_all),
-  states_proc = create_location_plot_and_return_users(l, state_data),
+  states_proc = create_location_plot_and_return_users(locs, state_data),
   sociogram_plot = create_sociogram(edge, users),
   descriptive_stats = create_descriptive_stats(users, orig, states),
-  proc_users = proc_users_data_for_locations(users, l, states_proc),
+  proc_users = proc_users_data_for_locations(users, locs, states_proc),
   influence = prepare_for_influence(orig_pre, orig_post, proc_users, edge),
   proc_coded_threads = prepare_coded_threads(coded_threads, influence),
   
