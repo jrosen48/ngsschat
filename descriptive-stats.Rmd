@@ -1,0 +1,37 @@
+---
+title: "Descriptive Stats"
+author: "JMR"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+params:
+  coded_threads: ""
+  influence: ""
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
+coded_threads <- params$coded_threads
+```
+
+```{r}
+coded_threads %>% janitor::tabyl(code)
+all_rows <- coded_threads %>% nrow()
+```
+
+```{r}
+coded_threads %>% count(ID) %>% filter(is.na(ID)) 
+qa_rows <- coded_threads %>% filter(is.na(ID)) %>% nrow()
+```
+
+```{r}
+coded_threads %>% count(ID) %>% filter(str_detect(ID, "uc"))
+uc_rows <- coded_threads %>% filter(str_detect(ID, "uc")) %>% nrow()
+```
+
+```{r}
+all_rows
+qa_rows
+uc_rows
+all_rows - qa_rows - uc_rows
+qa_rows + uc_rows
+```

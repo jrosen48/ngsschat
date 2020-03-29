@@ -486,7 +486,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Influence Models</h1>
 <h4 class="author">JMR</h4>
-<h4 class="date">26 March, 2020</h4>
+<h4 class="date">27 March, 2020</h4>
 
 </div>
 
@@ -541,21 +541,22 @@ m8a %&gt;% effectsize::standardize_parameters()</code></pre>
 <pre class="r"><code>m8b %&gt;% effectsize::standardize_parameters()</code></pre>
 <pre><code>## Waiting for profiling to be done...</code></pre>
 <pre><code>##     Parameter Std_Coefficient
-## 1 (Intercept)       2.9392868
-## 2          TS       0.3840721</code></pre>
+## 1 (Intercept)       2.9393259
+## 2          TS       0.3839969</code></pre>
 <pre class="r"><code>m8c %&gt;% effectsize::standardize_parameters()</code></pre>
 <pre><code>## Waiting for profiling to be done...</code></pre>
 <pre><code>##     Parameter Std_Coefficient
-## 1 (Intercept)       2.9848515
-## 2          SB       0.3594966</code></pre>
+## 1 (Intercept)        2.984809
+## 2          SB        0.359631</code></pre>
 <pre class="r"><code>m8f %&gt;% effectsize::standardize_parameters()</code></pre>
 <pre><code>## Waiting for profiling to be done...</code></pre>
 <pre><code>##     Parameter Std_Coefficient
-## 1 (Intercept)      2.89168672
-## 2   scale(TF)      0.23319092
-## 3   scale(TS)      0.28279924
-## 4   scale(SB)      0.03735191</code></pre>
-<pre class="r"><code>sjPlot::tab_model(m8a, m8b, m8c, m8f, show.ci = FALSE, show.std=T, file = &quot;unweighted-final-models.doc&quot;)</code></pre>
+## 1 (Intercept)       2.8917293
+## 2   scale(TF)       0.2331870
+## 3   scale(TS)       0.2826851
+## 4   scale(SB)       0.0374278</code></pre>
+<pre class="r"><code>file_path = str_c(&quot;out/&quot;, &quot;unweighted-final-models.doc&quot;)
+sjPlot::tab_model(m8a, m8b, m8c, m8f, show.ci = FALSE, show.std=T, file = file_path)</code></pre>
 <table style="border-collapse:collapse; border:none;">
 <tr>
 <th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">

@@ -14,6 +14,33 @@ coded_threads <- params$coded_threads
 influence <- params$influence
 ```
 
+```{r}
+coded_threads <- coded_threads %>% 
+  filter(!str_detect(ID, "uc"),
+         !is.na(ID))
+
+coded_threads %>% janitor::tabyl(code)
+all_rows <- coded_threads %>% nrow()
+```
+
+```{r}
+coded_threads %>% count(ID) %>% filter(is.na(ID)) 
+qa_rows <- coded_threads %>% filter(is.na(ID)) %>% nrow()
+```
+
+```{r}
+coded_threads %>% count(ID) %>% filter(str_detect(ID, "uc"))
+uc_rows <- coded_threads %>% filter(str_detect(ID, "uc")) %>% nrow()
+```
+
+```{r}
+all_rows
+qa_rows
+uc_rows
+all_rows - qa_rows - uc_rows
+qa_rows + uc_rows
+```
+
 ```{r output}
 n_groups <- coded_threads %>% 
   count(ID, group, code) %>% 

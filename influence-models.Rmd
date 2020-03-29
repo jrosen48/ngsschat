@@ -60,5 +60,6 @@ m8b %>% effectsize::standardize_parameters()
 m8c %>% effectsize::standardize_parameters()
 m8f %>% effectsize::standardize_parameters()
 
-sjPlot::tab_model(m8a, m8b, m8c, m8f, show.ci = FALSE, show.std=T, file = "unweighted-final-models.doc")
+file_path = str_c("out/", "unweighted-final-models.doc")
+sjPlot::tab_model(m8a, m8b, m8c, m8f, show.ci = FALSE, show.std=T, file = file_path)
 ```

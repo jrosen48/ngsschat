@@ -1,0 +1,26 @@
+---
+title: "Thread Summary"
+author: "JMR"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+params:
+  raw_qual_coded_data: ""
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
+raw_qual_coded_data <- params$raw_qual_coded_data
+```
+
+```{r}
+d <- raw_qual_coded_data %>% slice(201:300)
+d <- d %>% 
+  dplyr::select(JWR = Code, JMR = Notes) %>% 
+  mutate(JWR = if_else(is.na(JWR), "SB", JWR))
+
+irr::kappa2(d[1:50, ])
+irr::agree(d[1:50, ])
+
+irr::kappa2(d[51:100, ])
+irr::agree(d[51:100, ])
+```

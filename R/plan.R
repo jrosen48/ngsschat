@@ -1,4 +1,12 @@
 plan = drake_plan(
+  raw_qual_coded_data = read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vSNinqsHVFK2GZoL5_Bv7wxWLxIeUrZWwjY19UlMJTQ9tWdfS_gKF1yyDkw1YViFuP_VlyBSOw5OE5v/pub?output=csv"),
+  
+  interrater_reliability = rmarkdown::render(
+    knitr_in("interrater.Rmd"),
+    output_file = file_out("docs/interrater.html"),
+    params = list(raw_qual_coded_data = raw_qual_coded_data),
+  ),
+  
   orig_all = read_rds(file_in("data/all-ngsschat-tweets.rds")),
   users = read_csv(file_in("data/users-to-analyze.csv")),
   orig = read_rds(file_in("data/ngsschat-tweets-14-15.rds")),
@@ -9,13 +17,21 @@ plan = drake_plan(
   locs = read_rds(file_in("data/geocoded-locations.rds")),
   coded_threads = read_csv(file_in("data/qual-coded-tweets.csv")),
   
+  fixed_coded_threads = fix_codes(coded_threads),
   ts_plot = create_time_series(orig_all),
   states_proc = create_location_plot_and_return_users(locs, state_data),
   sociogram_plot = create_sociogram(edge, users),
   descriptive_stats = create_descriptive_stats(users, orig, states),
   proc_users = proc_users_data_for_locations(users, locs, states_proc),
   influence = prepare_for_influence(orig_pre, orig_post, proc_users, edge),
-  proc_coded_threads = prepare_coded_threads(coded_threads, influence),
+  
+  descriptive_stats_rmd = rmarkdown::render(
+    knitr_in("descriptive-stats.Rmd"),
+    output_file = file_out("docs/descriptive-stats.html"),
+    params = list(coded_threads = coded_threads),
+  ),
+  
+  proc_coded_threads = prepare_coded_threads(fixed_coded_threads, influence),
   
   thread_summary = rmarkdown::render(
     knitr_in("thread-summary.Rmd"),
