@@ -486,7 +486,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Thread Summary</h1>
 <h4 class="author">JMR</h4>
-<h4 class="date">27 March, 2020</h4>
+<h4 class="date">29 August, 2020</h4>
 
 </div>
 
@@ -525,9 +525,9 @@ coded_threads %&gt;% janitor::tabyl(code)</code></pre>
   count(ID, group, code) %&gt;% 
   count(ID, group, code) %&gt;% 
   group_by(ID, code) %&gt;% 
-  summarize(n_groups = sum(n))
-
-coded_threads %&gt;% 
+  summarize(n_groups = sum(n))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;ID&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>coded_threads %&gt;% 
   count(ID, group, code) %&gt;% 
   count(ID, group, code) %&gt;% 
   spread(group, n, fill = 0) %&gt;% 
@@ -539,6 +539,7 @@ coded_threads %&gt;%
   ungroup() %&gt;% 
   dplyr::select(Code = code, Teacher, Administrator, Researcher, Organization, Other) %&gt;% 
   filter(Code != &quot;RT&quot;)</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;code&#39; (override with `.groups` argument)</code></pre>
 <pre><code>## # A tibble: 4 x 6
 ##   Code  Teacher Administrator Researcher Organization Other
 ##   &lt;chr&gt;   &lt;dbl&gt;         &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt; &lt;dbl&gt;
@@ -550,9 +551,9 @@ coded_threads %&gt;%
   count(ID, group, code) %&gt;% 
   count(ID, group, code) %&gt;% 
   group_by(ID, code) %&gt;% 
-  summarize(sum_n_groups = sum(n))
-
-tm$code &lt;- as.factor(tm$code)
+  summarize(sum_n_groups = sum(n))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;ID&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>tm$code &lt;- as.factor(tm$code)
 m &lt;- glm(sum_n_groups ~ code, data = tm, family = &quot;poisson&quot;)
 g &lt;- glht(m, mcp(code=&quot;Tukey&quot;))
 summary(m)</code></pre>
@@ -606,9 +607,9 @@ sum_n_groups &lt;- coded_threads %&gt;%
   count(ID, status_id, code) %&gt;% 
   count(ID, status_id, code) %&gt;% 
   group_by(ID, code) %&gt;% 
-  summarize(sum_n_groups = sum(n))
-
-coded_threads %&gt;% 
+  summarize(sum_n_groups = sum(n))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;ID&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>coded_threads %&gt;% 
   count(ID, status_id, code) %&gt;% 
   count(ID, status_id, code) %&gt;% 
   group_by(ID, code) %&gt;% 
@@ -616,6 +617,8 @@ coded_threads %&gt;%
   group_by(code) %&gt;% 
   summarize(mean_n = mean(sum_n_groups),
             sd_n = sd(sum_n_groups))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;ID&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
 <pre><code>## # A tibble: 5 x 3
 ##   code  mean_n  sd_n
 ##   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;
@@ -628,9 +631,9 @@ coded_threads %&gt;%
   count(ID, status_id, code) %&gt;% 
   count(ID, status_id, code) %&gt;% 
   group_by(ID, code) %&gt;% 
-  summarize(sum_n_groups = sum(n))
-
-tm$code &lt;- as.factor(tm$code)
+  summarize(sum_n_groups = sum(n))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;ID&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>tm$code &lt;- as.factor(tm$code)
 m &lt;- glm(sum_n_groups ~ code, data = tm, family = &quot;poisson&quot;)
 g &lt;- glht(m, mcp(code=&quot;Tukey&quot;))
 summary(m)</code></pre>
@@ -650,7 +653,7 @@ summary(m)</code></pre>
 ## codeTF       0.60682    0.29635   2.048   0.0406 *
 ## codeTS      -0.01338    0.26853  -0.050   0.9603  
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## (Dispersion parameter for poisson family taken to be 1)
 ## 
@@ -681,16 +684,16 @@ summary(m)</code></pre>
 ## TS - SB == 0 -0.10582    0.03174  -3.334  0.00544 ** 
 ## TS - TF == 0 -0.62020    0.13067  -4.746  &lt; 0.001 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## (Adjusted p values reported -- single-step method)</code></pre>
 <pre class="r"><code># m individuals participated
 ind_participated &lt;- coded_threads %&gt;% 
   count(ID, screen_name, code) %&gt;% 
   count(ID, screen_name, code) %&gt;% 
   group_by(ID, code) %&gt;% 
-  summarize(ind_participated = sum(n))
-
-coded_threads %&gt;% 
+  summarize(ind_participated = sum(n))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;ID&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>coded_threads %&gt;% 
   count(ID, screen_name, code) %&gt;% 
   count(ID, screen_name, code) %&gt;% 
   group_by(ID, code) %&gt;% 
@@ -698,6 +701,8 @@ coded_threads %&gt;%
   group_by(code) %&gt;% 
   summarize(mean_n = mean(sum_n_groups),
             sd_n = sd(sum_n_groups))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;ID&#39; (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
 <pre><code>## # A tibble: 5 x 3
 ##   code  mean_n  sd_n
 ##   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;
@@ -710,9 +715,9 @@ coded_threads %&gt;%
   count(ID, screen_name, code) %&gt;% 
   count(ID, screen_name, code) %&gt;% 
   group_by(ID, code) %&gt;% 
-  summarize(sum_n_groups = sum(n))
-
-tm$code &lt;- as.factor(tm$code)
+  summarize(sum_n_groups = sum(n))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;ID&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>tm$code &lt;- as.factor(tm$code)
 m &lt;- glm(sum_n_groups ~ code, data = tm, family = &quot;poisson&quot;)
 g &lt;- glht(m, mcp(code=&quot;Tukey&quot;))
 summary(m)</code></pre>
@@ -766,9 +771,9 @@ n_groups &lt;- coded_threads %&gt;%
   count(ID, group, code) %&gt;% 
   count(ID, group, code) %&gt;% 
   group_by(ID, code) %&gt;% 
-  summarize(n_groups = sum(n))
-
-coded_threads %&gt;% 
+  summarize(n_groups = sum(n))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;ID&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>coded_threads %&gt;% 
   count(ID, group, code) %&gt;% 
   count(ID, group, code) %&gt;% 
   group_by(ID, code) %&gt;% 
@@ -776,6 +781,8 @@ coded_threads %&gt;%
   group_by(code) %&gt;% 
   summarize(mean_n = mean(sum_n_groups),
             sd_n = sd(sum_n_groups))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;ID&#39; (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
 <pre><code>## # A tibble: 5 x 3
 ##   code  mean_n  sd_n
 ##   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;
@@ -788,9 +795,9 @@ coded_threads %&gt;%
   count(ID, group, code) %&gt;% 
   count(ID, group, code) %&gt;% 
   group_by(ID, code) %&gt;% 
-  summarize(sum_n_groups = sum(n))
-
-tm$code &lt;- as.factor(tm$code)
+  summarize(sum_n_groups = sum(n))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;ID&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>tm$code &lt;- as.factor(tm$code)
 m &lt;- glm(sum_n_groups ~ code, data = tm, family = &quot;poisson&quot;)
 g &lt;- glht(m, mcp(code=&quot;Tukey&quot;))
 summary(m)</code></pre>
@@ -845,9 +852,9 @@ n_adoption &lt;-
   count(ID, adoption_tri, code) %&gt;% 
   count(ID, adoption_tri, code) %&gt;% 
   group_by(ID, code) %&gt;% 
-  summarize(n_adoption = sum(n))
-
-coded_threads %&gt;% 
+  summarize(n_adoption = sum(n))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;ID&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>coded_threads %&gt;% 
   count(ID, adoption_tri, code) %&gt;% 
   count(ID, adoption_tri, code) %&gt;% 
   group_by(ID, code) %&gt;% 
@@ -855,21 +862,23 @@ coded_threads %&gt;%
   group_by(code) %&gt;% 
   summarize(mean_n = mean(sum_n_groups),
             sd_n = sd(sum_n_groups))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;ID&#39; (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
 <pre><code>## # A tibble: 5 x 3
 ##   code  mean_n  sd_n
 ##   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;
-## 1 OT      1.38 0.518
-## 2 RT      1.09 0.302
-## 3 SB      1.38 0.566
-## 4 TF      1.79 0.535
-## 5 TS      1.40 0.517</code></pre>
+## 1 OT      1.25 0.463
+## 2 RT      1    0    
+## 3 SB      1.33 0.519
+## 4 TF      1.63 0.597
+## 5 TS      1.35 0.489</code></pre>
 <pre class="r"><code>tm &lt;- coded_threads %&gt;% 
   count(ID, adoption_tri, code) %&gt;% 
   count(ID, adoption_tri, code) %&gt;% 
   group_by(ID, code) %&gt;% 
-  summarize(sum_n_groups = sum(n))
-
-tm$code &lt;- as.factor(tm$code)
+  summarize(sum_n_groups = sum(n))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;ID&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>tm$code &lt;- as.factor(tm$code)
 m &lt;- glm(sum_n_groups ~ code, data = tm, family = &quot;poisson&quot;)
 g &lt;- glht(m, mcp(code=&quot;Tukey&quot;))
 summary(m)</code></pre>
@@ -879,21 +888,21 @@ summary(m)</code></pre>
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -0.6443  -0.3384  -0.3384   0.4799   1.8118  
+## -0.5330  -0.2954  -0.2954   0.5230   1.2461  
 ## 
 ## Coefficients:
-##              Estimate Std. Error z value Pr(&gt;|z|)
-## (Intercept)  0.318454   0.301511   1.056    0.291
-## codeRT      -0.231442   0.417423  -0.554    0.579
-## codeSB       0.001928   0.302262   0.006    0.995
-## codeTF       0.263468   0.346873   0.760    0.448
-## codeTS       0.014985   0.302907   0.049    0.961
+##             Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept)  0.22314    0.31623   0.706    0.480
+## codeRT      -0.22314    0.43693  -0.511    0.610
+## codeSB       0.05843    0.31697   0.184    0.854
+## codeTF       0.26640    0.36367   0.733    0.464
+## codeTS       0.07596    0.31761   0.239    0.811
 ## 
 ## (Dispersion parameter for poisson family taken to be 1)
 ## 
-##     Null deviance: 494.83  on 2488  degrees of freedom
-## Residual deviance: 491.91  on 2484  degrees of freedom
-## AIC: 6050.5
+##     Null deviance: 439.28  on 2488  degrees of freedom
+## Residual deviance: 436.83  on 2484  degrees of freedom
+## AIC: 5924
 ## 
 ## Number of Fisher Scoring iterations: 4</code></pre>
 <pre class="r"><code>summary(g)</code></pre>
@@ -906,17 +915,17 @@ summary(m)</code></pre>
 ## Fit: glm(formula = sum_n_groups ~ code, family = &quot;poisson&quot;, data = tm)
 ## 
 ## Linear Hypotheses:
-##               Estimate Std. Error z value Pr(&gt;|z|)
-## RT - OT == 0 -0.231442   0.417423  -0.554    0.976
-## SB - OT == 0  0.001928   0.302262   0.006    1.000
-## TF - OT == 0  0.263468   0.346873   0.760    0.926
-## TS - OT == 0  0.014985   0.302907   0.049    1.000
-## SB - RT == 0  0.233370   0.289459   0.806    0.910
-## TF - RT == 0  0.494910   0.335775   1.474    0.520
-## TS - RT == 0  0.246427   0.290133   0.849    0.893
-## TF - SB == 0  0.261540   0.172815   1.513    0.493
-## TS - SB == 0  0.013058   0.036014   0.363    0.995
-## TS - TF == 0 -0.248483   0.173941  -1.429    0.551
+##              Estimate Std. Error z value Pr(&gt;|z|)
+## RT - OT == 0 -0.22314    0.43693  -0.511    0.982
+## SB - OT == 0  0.05843    0.31697   0.184    1.000
+## TF - OT == 0  0.26640    0.36367   0.733    0.935
+## TS - OT == 0  0.07596    0.31761   0.239    0.999
+## SB - RT == 0  0.28158    0.30229   0.931    0.857
+## TF - RT == 0  0.48955    0.35095   1.395    0.573
+## TS - RT == 0  0.29910    0.30296   0.987    0.829
+## TF - SB == 0  0.20797    0.18091   1.150    0.735
+## TS - SB == 0  0.01752    0.03667   0.478    0.986
+## TS - TF == 0 -0.19045    0.18202  -1.046    0.797
 ## (Adjusted p values reported -- single-step method)</code></pre>
 <pre class="r"><code># n individuals participated in at least one
 one_or_more &lt;- function(x) {

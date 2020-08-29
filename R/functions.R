@@ -1,3 +1,7 @@
+safe_log <- function(x) {
+  ifelse(x == 0, 0, log(x))
+}
+
 create_time_series <- function(orig_all) {
   p <- orig_all %>% 
     filter(!is_retweet) %>% 
@@ -77,7 +81,7 @@ create_location_plot_and_return_users <- function(l, state_data) {
     geom_sf(aes(fill = as.factor(adoption))) +
     ggrepel::geom_label_repel(
       data = states_points,
-      aes(label = n, geometry = geometry),
+      aes(label = n, geometry = geom),
       stat = "sf_coordinates",
       point.padding = 0,
       min.segment.length = .025,
@@ -234,7 +238,7 @@ proc_users_data_for_locations <- function(users, l, states) {
     dplyr::select(ID, adoption) %>% 
     rename(state = ID) %>%
     as_tibble() %>% 
-    dplyr::select(-geometry) %>% 
+    dplyr::select(-geom) %>% 
     right_join(users) %>% 
     mutate(adoption_cont = case_when(
       adoption <= 2 ~ 1,
@@ -403,10 +407,6 @@ prepare_coded_threads <- function(coded_threads, influence) {
   coded_threads <- coded_threads %>% 
     mutate(screen_name = tolower(screen_name)) %>% 
     left_join(dplyr::select(influence, screen_name, n_tweets, adoption_tri, group))
-  
-  safe_log <- function(x) {
-    ifelse(x == 0, 0, log(x))
-  }
   
   sum_n_tweets <- coded_threads %>% 
     group_by(ID) %>% 
