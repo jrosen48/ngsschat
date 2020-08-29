@@ -461,13 +461,16 @@ $(document).ready(function () {
   <a href="index.html">Home</a>
 </li>
 <li>
-  <a href="thread-summary.html">Descriptive Statistics for Threads (RQ</a>
+  <a href="display-images.html">Preliminary</a>
 </li>
 <li>
-  <a href="influence-models.html">Influence Models (RQ</a>
+  <a href="thread-summary.html">Conversations (RQ</a>
 </li>
 <li>
-  <a href="display-images.html">Images</a>
+  <a href="selection.html">Participation (RQ</a>
+</li>
+<li>
+  <a href="influence-models.html">Influence (RQ</a>
 </li>
 <li>
   <a href="drake-graph.html">Drake Graph</a>
@@ -493,45 +496,45 @@ $(document).ready(function () {
 
 <pre class="r"><code>coded_threads %&gt;% janitor::tabyl(code)</code></pre>
 <pre><code>##  code    n      percent valid_percent
-##    OT   14 0.0018776824   0.001878186
-##    RT  102 0.0136802575   0.013683928
-##    SB 3073 0.4121512876   0.412261873
-##    TF   61 0.0081813305   0.008183526
-##    TS 4204 0.5638412017   0.563992487
-##  &lt;NA&gt;    2 0.0002682403            NA</code></pre>
+##    OT   21 0.0018994211   0.001900109
+##    RT  106 0.0095875543   0.009591024
+##    SB 5472 0.4949348770   0.495114007
+##    TF  117 0.0105824891   0.010586319
+##    TS 5336 0.4826338640   0.482808541
+##  &lt;NA&gt;    4 0.0003617945            NA</code></pre>
 <pre class="r"><code>all_rows &lt;- coded_threads %&gt;% nrow()</code></pre>
 <pre class="r"><code>coded_threads %&gt;% count(ID) %&gt;% filter(is.na(ID)) </code></pre>
 <pre><code>## # A tibble: 1 x 2
 ##   ID        n
 ##   &lt;chr&gt; &lt;int&gt;
-## 1 &lt;NA&gt;   1530</code></pre>
+## 1 &lt;NA&gt;   2353</code></pre>
 <pre class="r"><code>qa_rows &lt;- coded_threads %&gt;% filter(is.na(ID)) %&gt;% nrow()</code></pre>
 <pre class="r"><code>coded_threads %&gt;% count(ID) %&gt;% filter(str_detect(ID, &quot;uc&quot;))</code></pre>
-<pre><code>## # A tibble: 1,298 x 2
+<pre><code>## # A tibble: 1,281 x 2
 ##    ID          n
 ##    &lt;chr&gt;   &lt;int&gt;
-##  1 uc-100      1
-##  2 uc-1000     1
-##  3 uc-1001     1
-##  4 uc-1002     1
-##  5 uc-1003     1
-##  6 uc-1004     1
-##  7 uc-1005     1
-##  8 uc-1006     1
+##  1 uc-1        1
+##  2 uc-100      1
+##  3 uc-1000     1
+##  4 uc-1001     1
+##  5 uc-1002     1
+##  6 uc-1003     1
+##  7 uc-1004     1
+##  8 uc-1005     1
 ##  9 uc-1007     1
 ## 10 uc-1008     1
-## # … with 1,288 more rows</code></pre>
+## # … with 1,271 more rows</code></pre>
 <pre class="r"><code>uc_rows &lt;- coded_threads %&gt;% filter(str_detect(ID, &quot;uc&quot;)) %&gt;% nrow()</code></pre>
 <pre class="r"><code>all_rows</code></pre>
-<pre><code>## [1] 7456</code></pre>
+<pre><code>## [1] 11056</code></pre>
 <pre class="r"><code>qa_rows</code></pre>
-<pre><code>## [1] 1530</code></pre>
+<pre><code>## [1] 2353</code></pre>
 <pre class="r"><code>uc_rows</code></pre>
-<pre><code>## [1] 1298</code></pre>
+<pre><code>## [1] 1281</code></pre>
 <pre class="r"><code>all_rows - qa_rows - uc_rows</code></pre>
-<pre><code>## [1] 4628</code></pre>
+<pre><code>## [1] 7422</code></pre>
 <pre class="r"><code>qa_rows + uc_rows</code></pre>
-<pre><code>## [1] 2828</code></pre>
+<pre><code>## [1] 3634</code></pre>
 
 
 
