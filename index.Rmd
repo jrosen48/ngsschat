@@ -1,6 +1,6 @@
 ---
 title: "#NGSSchat Analysis"
-date: "`r str_c('Updated ', format(Sys.time(), '%d %B, %Y'))`"
+date: "`r stringr::str_c('Updated ', format(Sys.time(), '%d %B, %Y'))`"
 output: html_document
 ---
 
@@ -12,11 +12,3 @@ This is for an analysis associated with #NGSSchat on Twitter by:
 - Matthew Koehler
 - Christian Fischer
 - T. J. McKenna
-
-Output:
-
-  - [Descriptive Stats for Threads)](thread-summary.html)
-  - [Images](display-images.html)
-  - [Interrater](interrater.html)
-  - [Influence Models](influence-models.html)
-  - [Selection models](selection.html)
