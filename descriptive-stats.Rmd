@@ -9,6 +9,7 @@ params:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
+coded_threads <- params$coded_threads
 ```
 
 ```{r}

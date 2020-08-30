@@ -13,53 +13,19 @@ influence <- params$influence
 ```
 
 ```{r output}
-m8a <- glm(post_n ~ 1 +
-             # adoption_tri +
-             # scale(n_tweets) +
-             TF,
-           data = influence,
-           family = 'poisson')
+# influence <- drake::readd(influence_to_model)
 
-m8b <- glm(post_n ~ 1 +
-             # adoption_tri +
-             # scale(n_tweets) +
-             TS,
-           data = influence,
-           family = 'poisson')
+influence <- influence %>% 
+  select(TS, TF, SB, group, post_n) %>% 
+  mutate_if(is.numeric, tidyr::replace_na, 0) %>% 
+  mutate(substantive = TF + SB) %>% 
+  rename(transactional = TS)
 
-m8c <- glm(post_n ~ 1 +
-             # adoption_tri +
-             # scale(n_tweets) +
-            SB,
-           data = influence,
-           family = 'poisson')
+m <- glm(post_n ~
+           scale(transactional) + scale(substantive) +
+           group,
+         data = influence,
+         family = 'poisson')
 
-m8d <- glm(post_n ~ 1 +
-             #adoption_tri +
-             scale(TF) + scale(TS) + scale(SB),
-           #group,
-           data = influence,
-           family = 'poisson')
-
-m8e <- glm(post_n ~ 1 +
-             #adoption_tri +
-             scale(TF) + scale(TS) + scale(SB) +
-             group,
-           data = influence,
-           family = 'poisson')
-
-m8f <- glm(post_n ~ 1 +
-             #adoption_tri +
-             scale(TF) + scale(TS) + scale(SB),
-           #group,
-           data = influence,
-           family = 'poisson')
-
-m8a %>% effectsize::standardize_parameters()
-m8b %>% effectsize::standardize_parameters()
-m8c %>% effectsize::standardize_parameters()
-m8f %>% effectsize::standardize_parameters()
-
-file_path = str_c("out/", "unweighted-final-models.doc")
-sjPlot::tab_model(m8a, m8b, m8c, m8f, show.ci = FALSE, show.std=T, file = file_path)
+sjPlot::tab_model(m, show.ci = FALSE, show.std = T)
 ```

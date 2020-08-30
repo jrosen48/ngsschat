@@ -5,6 +5,10 @@ navbar:
   left:
   - text: Home
     href: index.html
+  - text: GitHub (code)
+    href: https://jrosen48.github.io/ngsschat/index.html
+  - text: OSF (data)
+    href: https://osf.io/9ex7k/
   - text: Preliminary
     href: preliminary.html
   - text: RQ1
