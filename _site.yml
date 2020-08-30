@@ -5,7 +5,6 @@ navbar:
   left:
   - text: Home
     href: index.html
-  - text: Preliminary
     href: preliminary.html
   - text: RQ1
     href: rq1.html
