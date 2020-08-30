@@ -5,14 +5,15 @@ navbar:
   left:
   - text: Home
     href: index.html
-  - text: Descriptive Statistics for Threads (RQ #3)
-    href: thread-summary.html
-  - text: Influence Models (RQ #4)
-    href: influence-models.html
-  - text: Images
-    href: display-images.html
-  - text: Drake Graph
+  - text: Preliminary
+    href: preliminary.html
+  - text: RQ1
+    href: rq1.html
+  - text: RQ2
+    href: rq2.html
+  - text: RQ3
+    href: rq3.html
+  - text: Drake
     href: drake-graph.html
-
 output:
   html_document:

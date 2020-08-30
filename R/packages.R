@@ -7,3 +7,8 @@ library(ggraph)
 library(readxl)
 library(multcomp)
 library(irr)
+library(conflicted)
+library(renv)
+
+conflict_prefer("filter", "dplyr")
+conflict_prefer("gather", "tidyr")
