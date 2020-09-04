@@ -12,6 +12,9 @@ plan = drake_plan(
   state_data = read_excel(file_in("data/state-data.xlsx")),
   locs = read_rds(file_in("data/geocoded-locations.rds")),
   coded_threads = read_csv(file_in("data/qual-coded-tweets.csv")),
+  edgelist_of_coded_data = read_csv(file_in("data/edgelist.csv")),
+  all_unfiltered_coded_threads = read_csv(file_in("data/all-unfiltered-coded-threads.csv"), col_types = cols(ID = col_character())),
+  users_to_analyze = read_csv(file_in('data/users-to-analyze.csv')),
   
   # processing data
   
@@ -23,7 +26,7 @@ plan = drake_plan(
   proc_users = proc_users_data_for_locations(users, locs, states_proc),
   influence = prepare_for_influence(orig_pre, orig_post, proc_users, edge),
   proc_coded_threads = prepare_coded_threads(fixed_coded_threads, influence),
-  influence_to_model = prep_influence_for_modeling(proc_coded_threads, influence),
+  # influence_to_model = prep_influence_for_modeling(proc_coded_threads, influence),
   
   # RMD documents
   
@@ -32,12 +35,15 @@ plan = drake_plan(
   preliminary_results = rmarkdown::render(
     knitr_in("descriptive-stats.Rmd"),
     output_file = file_out("docs/preliminary.html"),
-    params = list(coded_threads = coded_threads)),
+    params = list(all_unfiltered_coded_threads = all_unfiltered_coded_threads,
+                  users_to_analyze = users_to_analyze,
+                  influence = influence)),
 
   conversations_rq1 = rmarkdown::render(
     knitr_in("interrater.Rmd"),
     output_file = file_out("docs/rq1.html"),
-    params = list(raw_qual_coded_data = raw_qual_coded_data)),
+    params = list(raw_qual_coded_data = raw_qual_coded_data,
+                  coded_threads = coded_threads)),
   
   participation_rq2 = rmarkdown::render(
     knitr_in("thread-summary.Rmd"),
@@ -45,10 +51,10 @@ plan = drake_plan(
     params = list(coded_threads = proc_coded_threads,
                   influence = influence)),
   
-  sustained_involvement_rq3 = rmarkdown::render(
-    knitr_in("influence-models.Rmd"),
-    output_file = file_out("docs/rq3.html"),
-    params = list(influence = influence_to_model)),
+  # sustained_involvement_rq3 = rmarkdown::render(
+  #   knitr_in("influence-models.Rmd"),
+  #   output_file = file_out("docs/rq3.html"),
+  #   params = list(edgelist = edgelist_of_coded_data)),
   
   ## other documents
   

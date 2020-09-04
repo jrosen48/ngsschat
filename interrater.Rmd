@@ -5,11 +5,13 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: html_document
 params:
   raw_qual_coded_data: ""
+  coded_threads: ""
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
 raw_qual_coded_data <- params$raw_qual_coded_data
+coded_threads <- params$coded_threads
 ```
 
 ```{r}
@@ -24,3 +26,26 @@ irr::agree(d[1:50, ])
 irr::kappa2(d[51:100, ])
 irr::agree(d[51:100, ])
 ```
+
+
+```{r}
+coded_threads %>% janitor::tabyl(code)
+```
+
+```{r}
+coded_threads %>% count(ID) %>% filter(is.na(ID)) 
+qa_rows <- coded_threads %>% filter(is.na(ID)) %>% nrow()
+```
+
+```{r}
+coded_threads %>% count(ID) %>% filter(str_detect(ID, "uc"))
+uc_rows <- coded_threads %>% filter(str_detect(ID, "uc")) %>% nrow()
+```
+
+```{r}
+qa_rows
+uc_rows
+qa_rows - uc_rows
+qa_rows + uc_rows
+```
+

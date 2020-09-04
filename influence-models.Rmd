@@ -4,28 +4,61 @@ author: "JMR"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: html_document
 params:
+  edgelist: ""
   influence: ""
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
+edgelist <- params$edgelist
 influence <- params$influence
 ```
 
-```{r output}
-# influence <- drake::readd(influence_to_model)
+```{r}
+edge <- edgelist %>% 
+  filter(var == "ts")
 
-influence <- influence %>% 
-  select(TS, TF, SB, group, post_n) %>% 
-  mutate_if(is.numeric, tidyr::replace_na, 0) %>% 
-  mutate(substantive = TF + SB) %>% 
-  rename(transactional = TS)
+i <- influence %>% 
+  select(-code)
 
-m <- glm(post_n ~
-           scale(transactional) + scale(substantive) +
-           group,
-         data = influence,
-         family = 'poisson')
+tm <- edge %>% 
+  left_join(dc) %>% 
+  group_by(receiver) %>% 
+  summarize(exposure_sum = sum(degree_in)) %>% 
+  rename(screen_name = receiver)
 
-sjPlot::tab_model(m, show.ci = FALSE, show.std = T)
+i <- i %>% 
+  left_join(tm) %>% 
+  mutate(exposure_sum = ifelse(is.na(exposure_sum), 0, exposure_sum))
+
+edge_sb <- edgelist %>% 
+  filter(var == "sb" | var == "tf")
+
+tm <- edge_sb %>% 
+  left_join(dc) %>% 
+  group_by(receiver) %>% 
+  summarize(exposure_sum_sb = sum(degree_in)) %>% 
+  rename(screen_name = receiver)
+
+i <- i %>% 
+  left_join(tm) %>% 
+  mutate(exposure_sum = ifelse(is.na(exposure_sum), 0, exposure_sum),
+         exposure_sum_sb = ifelse(is.na(exposure_sum_sb), 0, exposure_sum_sb))
+
+
+i$exposure_sum_std <- as.vector(scale(i$exposure_sum))
+i$exposure_sum_sb_std <- as.vector(scale(i$exposure_sum_sb))
+i$group <- fct_relevel(as.factor(i$group), "Other")
+
+mts <- glm(post_n ~ 1 +
+             exposure_sum_std + exposure_sum_sb_std + group,
+           data = i,
+           family = 'poisson')
+
+sjPlot::tab_model(mts)
+
+library(multcomp)
+
+g <- multcomp::glht(mts, multcomp::mcp(group="Tukey"))
+g
 ```
