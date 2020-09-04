@@ -12,6 +12,7 @@ library(multcomp)
 library(irr)
 library(conflicted)
 library(renv)
+library(multcomp)
 
 conflict_prefer("filter", "dplyr")
 conflict_prefer("gather", "tidyr")

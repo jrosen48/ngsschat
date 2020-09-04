@@ -685,3 +685,7 @@ transform_edgelist <- function(edgelist, users_data_from_rtweet){
   edgelist_with_all_users_data <- dplyr::select(edgelist_with_all_users_data, -screen_name)
   edgelist_with_all_users_data
 }
+
+render_site <- function() {
+  rmarkdown::render_site("docs")
+}

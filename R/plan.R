@@ -51,19 +51,18 @@ plan = drake_plan(
     params = list(coded_threads = proc_coded_threads,
                   influence = influence)),
   
-  # sustained_involvement_rq3 = rmarkdown::render(
-  #   knitr_in("influence-models.Rmd"),
-  #   output_file = file_out("docs/rq3.html"),
-  #   params = list(edgelist = edgelist_of_coded_data)),
+  sustained_involvement_rq3 = rmarkdown::render(
+    knitr_in("influence-models.Rmd"),
+    output_file = file_out("docs/rq3.html"),
+    params = list(edgelist = edgelist_of_coded_data,
+                  influence = influence)),
   
   ## other documents
   
-  index = rmarkdown::render(
-    knitr_in("index.Rmd"),
-    output_file = file_out("docs/index.html")),
-  
   drake_graph = rmarkdown::render(
     knitr_in("drake-graph.Rmd"),
-    output_file = file_out("docs/drake-graph.html"))
+    output_file = file_out("docs/drake-graph.html")),
+  
+  rendered_site = render_site()
   
 )

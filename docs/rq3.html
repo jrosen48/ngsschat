@@ -461,6 +461,12 @@ $(document).ready(function () {
   <a href="index.html">Home</a>
 </li>
 <li>
+  <a href="https://jrosen48.github.io/ngsschat/index.html">GitHub (code)</a>
+</li>
+<li>
+  <a href="https://osf.io/9ex7k/">OSF (data)</a>
+</li>
+<li>
   <a href="preliminary.html">Preliminary</a>
 </li>
 <li>
@@ -489,81 +495,184 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Influence Models</h1>
 <h4 class="author">JMR</h4>
-<h4 class="date">29 August, 2020</h4>
+<h4 class="date">04 September, 2020</h4>
 
 </div>
 
 
-<pre class="r"><code>m8a &lt;- glm(post_n ~ 1 +
-             # adoption_tri +
-             # scale(n_tweets) +
-             TF,
-           data = influence,
-           family = &#39;poisson&#39;)
+<pre class="r"><code>g &lt;- graph_from_data_frame(e)
 
-m8b &lt;- glm(post_n ~ 1 +
-             # adoption_tri +
-             # scale(n_tweets) +
-             TS,
-           data = influence,
-           family = &#39;poisson&#39;)
+dc &lt;- degree(g, mode = &quot;in&quot;) %&gt;% 
+  as.data.frame() %&gt;% 
+  rownames_to_column() %&gt;% 
+  set_names(&quot;sender&quot;, &quot;degree_in&quot;)
 
-m8c &lt;- glm(post_n ~ 1 +
-             # adoption_tri +
-             # scale(n_tweets) +
-            SB,
-           data = influence,
-           family = &#39;poisson&#39;)
+# dc &lt;- e %&gt;% 
+#   count(sender) %&gt;% 
+#   arrange(desc(n)) %&gt;% 
+#   set_names(&quot;sender&quot;, &quot;degree_in&quot;)
 
-m8d &lt;- glm(post_n ~ 1 +
-             #adoption_tri +
-             scale(TF) + scale(TS) + scale(SB),
-           #group,
-           data = influence,
-           family = &#39;poisson&#39;)
+dc %&gt;% 
+  as_tibble() %&gt;% 
+  arrange(desc(degree_in))</code></pre>
+<pre><code>## # A tibble: 282 x 2
+##    sender          degree_in
+##    &lt;chr&gt;               &lt;dbl&gt;
+##  1 fredende              780
+##  2 tdishelton            285
+##  3 ted_nsta              225
+##  4 drspruitt             156
+##  5 reiserbrianj          128
+##  6 starrscience          117
+##  7 gablejen              117
+##  8 richbacolor           107
+##  9 davidhochheiser        98
+## 10 kastidham              92
+## # … with 272 more rows</code></pre>
+<pre class="r"><code>edge &lt;- e %&gt;% 
+  filter(var == &quot;ts&quot;)
 
-m8e &lt;- glm(post_n ~ 1 +
-             #adoption_tri +
-             scale(TF) + scale(TS) + scale(SB) +
-             group,
-           data = influence,
-           family = &#39;poisson&#39;)
+i &lt;- i %&gt;% 
+  dplyr::select(-code)
 
-m8f &lt;- glm(post_n ~ 1 +
-             #adoption_tri +
-             scale(TF) + scale(TS) + scale(SB),
-           #group,
-           data = influence,
-           family = &#39;poisson&#39;)
+# g &lt;- graph_from_data_frame(edge)
+# 
+# dci &lt;- degree(g, mode = &quot;in&quot;) %&gt;% 
+#   as.data.frame() %&gt;% 
+#   rownames_to_column() %&gt;% 
+#   set_names(&quot;sender&quot;, &quot;degree_in&quot;)
 
-m8a %&gt;% effectsize::standardize_parameters()</code></pre>
-<pre><code>## Waiting for profiling to be done...</code></pre>
-<pre><code>## Parameter   | Coefficient (std.) |       95% CI
-## -----------------------------------------------
-## (Intercept) |               2.92 | [2.89, 2.95]
-## TF          |               0.49 | [0.48, 0.50]</code></pre>
-<pre class="r"><code>m8b %&gt;% effectsize::standardize_parameters()</code></pre>
-<pre><code>## Waiting for profiling to be done...</code></pre>
-<pre><code>## Parameter   | Coefficient (std.) |       95% CI
-## -----------------------------------------------
-## (Intercept) |               2.91 | [2.88, 2.94]
-## TS          |               0.38 | [0.38, 0.39]</code></pre>
-<pre class="r"><code>m8c %&gt;% effectsize::standardize_parameters()</code></pre>
-<pre><code>## Waiting for profiling to be done...</code></pre>
-<pre><code>## Parameter   | Coefficient (std.) |       95% CI
-## -----------------------------------------------
-## (Intercept) |               3.00 | [2.97, 3.03]
-## SB          |               0.33 | [0.33, 0.34]</code></pre>
-<pre class="r"><code>m8f %&gt;% effectsize::standardize_parameters()</code></pre>
-<pre><code>## Waiting for profiling to be done...</code></pre>
-<pre><code>## Parameter   | Coefficient (std.) |         95% CI
-## -------------------------------------------------
-## (Intercept) |               2.88 | [ 2.85,  2.91]
-## scale(TF)   |               0.24 | [ 0.21,  0.26]
-## scale(TS)   |               0.30 | [ 0.29,  0.31]
-## scale(SB)   |              -0.05 | [-0.07, -0.04]</code></pre>
-<pre class="r"><code>file_path = str_c(&quot;out/&quot;, &quot;unweighted-final-models.doc&quot;)
-sjPlot::tab_model(m8a, m8b, m8c, m8f, show.ci = FALSE, show.std=T, file = file_path)</code></pre>
+tm &lt;- edge %&gt;% 
+  left_join(dc) %&gt;% 
+  group_by(receiver) %&gt;% 
+  summarize(exposure_sum = sum(degree_in)) %&gt;% 
+  rename(screen_name = receiver)</code></pre>
+<pre><code>## Joining, by = &quot;sender&quot;</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre class="r"><code># dc &lt;- degree(g, mode = &quot;in&quot;) %&gt;% 
+#   as.data.frame() %&gt;% 
+#   rownames_to_column() %&gt;% 
+#   set_names(&quot;screen_name&quot;, &quot;degree_in&quot;)
+# 
+# dc %&gt;% 
+#   left_join(u) %&gt;% 
+#   mutate(group = if_else(group == &quot;Unclear&quot;, &quot;Other&quot;, group)) %&gt;% 
+#   group_by(group) %&gt;% 
+#   summarize(in_degree = mean(degree_in),
+#             in_degree_sd = sd(degree_in)) %&gt;% 
+#   arrange(desc(in_degree))
+
+i &lt;- i %&gt;% 
+  left_join(tm) %&gt;% 
+  mutate(exposure_sum = ifelse(is.na(exposure_sum), 0, exposure_sum))</code></pre>
+<pre><code>## Joining, by = &quot;screen_name&quot;</code></pre>
+<pre class="r"><code>edge_sb &lt;- e %&gt;% 
+  filter(var == &quot;sb&quot; | var == &quot;tf&quot;)
+
+# g_sb &lt;- graph_from_data_frame(edge_sb)
+# 
+# dci_sb &lt;- degree(g_sb, mode = &quot;in&quot;) %&gt;% 
+#   as.data.frame() %&gt;% 
+#   rownames_to_column() %&gt;% 
+#   set_names(&quot;sender&quot;, &quot;degree_in&quot;)
+
+tm &lt;- edge_sb %&gt;% 
+  left_join(dc) %&gt;% 
+  group_by(receiver) %&gt;% 
+  summarize(exposure_sum_sb = sum(degree_in)) %&gt;% 
+  rename(screen_name = receiver)</code></pre>
+<pre><code>## Joining, by = &quot;sender&quot;
+## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre class="r"><code>i &lt;- i %&gt;% 
+  left_join(tm) %&gt;% 
+  mutate(exposure_sum = ifelse(is.na(exposure_sum), 0, exposure_sum),
+         exposure_sum_sb = ifelse(is.na(exposure_sum_sb), 0, exposure_sum_sb))</code></pre>
+<pre><code>## Joining, by = &quot;screen_name&quot;</code></pre>
+<pre class="r"><code># select(i, exposure_sum, exposure_sum_sb)
+i$exposure_sum_std &lt;- as.vector(scale(i$exposure_sum))
+i$exposure_sum_sb_std &lt;- as.vector(scale(i$exposure_sum_sb))
+#i$group &lt;- as.character(i$group)
+i$group &lt;- fct_relevel(as.factor(i$group), &quot;Other&quot;)
+i$group</code></pre>
+<pre><code>##   [1] Administrator Teacher       Other         Teacher       Researcher   
+##   [6] Other         Teacher       Teacher       Administrator Teacher      
+##  [11] Teacher       Other         Other         Teacher       Other        
+##  [16] Other         Teacher       Researcher    Organization  Teacher      
+##  [21] Teacher       Other         Teacher       Teacher       Researcher   
+##  [26] Teacher       Teacher       Other         Other         Teacher      
+##  [31] Other         Administrator Teacher       Teacher       Teacher      
+##  [36] Researcher    Other         Other         Teacher       Administrator
+##  [41] Administrator Other         Other         Teacher       Administrator
+##  [46] Teacher       Teacher       Organization  Administrator Teacher      
+##  [51] Administrator Teacher       Administrator Researcher    Other        
+##  [56] Researcher    Administrator Other         Teacher       Other        
+##  [61] Teacher       Other         Other         Other         Other        
+##  [66] Teacher       Administrator Teacher       Other         Teacher      
+##  [71] Organization  Other         Teacher       Other         Administrator
+##  [76] Administrator Teacher       Administrator Administrator Administrator
+##  [81] Other         Teacher       Other         Other         Other        
+##  [86] Administrator Other         Other         Teacher       Administrator
+##  [91] Administrator Other         Administrator Other         Other        
+##  [96] Other         Teacher       Other         Administrator Other        
+## [101] Teacher       Teacher       Teacher       Organization  Organization 
+## [106] Teacher       Other         Organization  Administrator Other        
+## [111] Teacher       Other         Teacher       Teacher       Administrator
+## [116] Teacher       Other         Other         Teacher       Researcher   
+## [121] Administrator Organization  Other         Teacher       Teacher      
+## [126] Teacher       Teacher       Administrator Administrator Teacher      
+## [131] Teacher       Teacher       Teacher       Teacher       Teacher      
+## [136] Teacher       Researcher    Teacher       Administrator Administrator
+## [141] Researcher    Other         Other         Other         Other        
+## [146] Administrator Teacher       Administrator Administrator Administrator
+## [151] Administrator Teacher       Administrator Teacher       Teacher      
+## [156] Teacher       Teacher       Teacher       Administrator Administrator
+## [161] Other         Other         Teacher       Other         Administrator
+## [166] Teacher       Other         Other         Other         Other        
+## [171] Teacher       Other         Organization  Teacher       Administrator
+## [176] Researcher    Teacher       Administrator Researcher    Teacher      
+## [181] Administrator Teacher       Other         Researcher    Administrator
+## [186] Administrator Other         Teacher       Teacher       Other        
+## [191] Other         Teacher       Teacher       Teacher       Other        
+## [196] Other         Organization  Researcher    Administrator Teacher      
+## [201] Administrator Administrator Teacher       Organization  Other        
+## [206] Teacher       Teacher       Researcher    Teacher       Other        
+## [211] Administrator Teacher       Teacher       Teacher       Teacher      
+## [216] Teacher       Teacher       Researcher    Other         Teacher      
+## [221] Organization  Other         Other         Administrator Administrator
+## [226] Teacher       Researcher    Administrator Administrator Other        
+## [231] Organization  Other         Administrator Administrator Teacher      
+## [236] Other         Administrator Organization  Teacher       Teacher      
+## [241] Researcher    Teacher       Teacher       Other         Other        
+## [246] Other         Teacher      
+## Levels: Other Administrator Organization Researcher Teacher</code></pre>
+<pre class="r"><code>i %&gt;% 
+  group_by(group) %&gt;% 
+  summarize(mean_post_n = mean(post_n),
+            median_post_n = median(post_n),
+            median_n_tweets = median(n_tweets),
+            post_n_users = sum(post_n &gt; 0),
+            sum_users = n(),
+            prop_n_users = post_n_users / sum_users,
+            sum_pre_n = sum(pre_n &gt; 0),
+            prop_pre_n = sum_pre_n / sum_users) %&gt;% 
+  arrange(desc(prop_n_users))</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## # A tibble: 5 x 9
+##   group mean_post_n median_post_n median_n_tweets post_n_users sum_users
+##   &lt;fct&gt;       &lt;dbl&gt;         &lt;dbl&gt;           &lt;dbl&gt;        &lt;int&gt;     &lt;int&gt;
+## 1 Rese…       27.6              8               9            9        17
+## 2 Admi…       45.4              1              13           28        53
+## 3 Teac…       25.7              1              12           47        93
+## 4 Other        6.80             0               6           22        71
+## 5 Orga…       22.5              0               9            4        13
+## # … with 3 more variables: prop_n_users &lt;dbl&gt;, sum_pre_n &lt;int&gt;,
+## #   prop_pre_n &lt;dbl&gt;</code></pre>
+<pre class="r"><code>mts &lt;- glm(post_n ~ 1 +
+            exposure_sum_std+ exposure_sum_sb_std + group,
+          data = i,
+          family = &#39;poisson&#39;)
+
+sjPlot::tab_model(mts)</code></pre>
 <table style="border-collapse:collapse; border:none;">
 <tr>
 <th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
@@ -572,13 +681,167 @@ sjPlot::tab_model(m8a, m8b, m8c, m8f, show.ci = FALSE, show.std=T, file = file_p
 <th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
 post n
 </th>
-<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
-post n
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Incidence Rate Ratios
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+8.16
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+7.47 – 8.92
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+exposure_sum_std
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.83
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.80 – 1.87
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+exposure_sum_sb_std
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.44
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.42 – 1.47
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+group [Administrator]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.79
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.61 – 1.99
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+group [Organization]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.20
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.17 – 0.24
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+group [Researcher]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.66
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.58 – 0.76
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+group [Teacher]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.90
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.72 – 2.10
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+247
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> Nagelkerke
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+1.000
+</td>
+</tr>
+</table>
+<pre class="r"><code>g &lt;- multcomp::glht(mts, multcomp::mcp(group=&quot;Tukey&quot;))
+g</code></pre>
+<pre><code>## 
+##   General Linear Hypotheses
+## 
+## Multiple Comparisons of Means: Tukey Contrasts
+## 
+## 
+## Linear Hypotheses:
+##                                   Estimate
+## Administrator - Other == 0         0.58327
+## Organization - Other == 0         -1.59635
+## Researcher - Other == 0           -0.41450
+## Teacher - Other == 0               0.64111
+## Organization - Administrator == 0 -2.17963
+## Researcher - Administrator == 0   -0.99777
+## Teacher - Administrator == 0       0.05784
+## Researcher - Organization == 0     1.18185
+## Teacher - Organization == 0        2.23747
+## Teacher - Researcher == 0          1.05562</code></pre>
+<pre class="r"><code>msb &lt;- glm(post_n ~ 1 +
+             exposure_sum_sb_std++ group + pre_n,
+           data = i,
+           family = &#39;poisson&#39;)
+sjPlot::tab_model(mts, show.std = T)</code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
 </th>
-<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
-post n
-</th>
-<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+<th colspan="5" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
 post n
 </th>
 </tr>
@@ -593,33 +856,12 @@ Incidence Rate Ratios
 std. Beta
 </td>
 <td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
-p
+CI
 </td>
 <td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
-Incidence Rate Ratios
+standardized CI
 </td>
 <td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
-std. Beta
-</td>
-<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col7">
-p
-</td>
-<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col8">
-Incidence Rate Ratios
-</td>
-<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col9">
-std. Beta
-</td>
-<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  0">
-p
-</td>
-<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  1">
-Incidence Rate Ratios
-</td>
-<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  2">
-std. Beta
-</td>
-<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  3">
 p
 </td>
 </tr>
@@ -628,231 +870,138 @@ p
 (Intercept)
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-16.06
+8.16
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-2.92
+2.10
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-<strong>&lt;0.001
+7.47 – 8.92
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-16.76
+2.01 – 2.19
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-2.91
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
-<strong>&lt;0.001
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8">
-18.00
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9">
-3.00
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0">
-<strong>&lt;0.001
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1">
-17.79
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2">
-2.88
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3">
 <strong>&lt;0.001
 </td>
 </tr>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-TF
+exposure_sum_std
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-1.34
+1.83
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.49
+0.61
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-<strong>&lt;0.001
+1.80 – 1.87
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.59 – 0.62
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3">
-</td>
-</tr>
-<tr>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-TS
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-1.01
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.38
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
-<strong>&lt;0.001
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3">
-</td>
-</tr>
-<tr>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-SB
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8">
-1.00
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9">
-0.33
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0">
-<strong>&lt;0.001
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3">
-</td>
-</tr>
-<tr>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-TF
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1">
-1.27
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2">
-0.24
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3">
 <strong>&lt;0.001
 </td>
 </tr>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-TS
+exposure_sum_sb_std
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.44
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.37
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.42 – 1.47
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.35 – 0.38
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0">
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1">
-1.35
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2">
-0.30
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3">
 <strong>&lt;0.001
 </td>
 </tr>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-SB
+group [Administrator]
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.79
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.58
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.61 – 1.99
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.48 – 0.69
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
 </td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+group [Organization]
 </td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8">
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.20
 </td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9">
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.60
 </td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0">
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.17 – 0.24
 </td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1">
-0.95
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.77 – -1.43
 </td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2">
--0.05
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
 </td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3">
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+group [Researcher]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.66
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.41
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.58 – 0.76
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.55 – -0.28
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+group [Teacher]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.90
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.64
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.72 – 2.10
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.54 – 0.74
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
 <strong>&lt;0.001
 </td>
 </tr>
@@ -860,37 +1009,349 @@ SB
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
 Observations
 </td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
-231
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
-231
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
-231
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
-231
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="5">
+247
 </td>
 </tr>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
 R<sup>2</sup> Nagelkerke
 </td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
-1.000
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
-1.000
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
-1.000
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="5">
 1.000
 </td>
 </tr>
 </table>
+<pre class="r"><code>sjPlot::tab_model(msb, show.std = T)</code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="5" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+post n
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Incidence Rate Ratios
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+std. Beta
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+standardized CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+7.08
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.01
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+6.47 – 7.74
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.92 – 2.10
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+exposure_sum_sb_std
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.29
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.26
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.27 – 1.32
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.24 – 0.28
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+group [Administrator]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.29
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.83
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.06 – 2.56
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.72 – 0.94
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+group [Organization]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.61
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.96
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.26 – 3.03
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.81 – 1.11
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+group [Researcher]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+3.15
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.15
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.77 – 3.58
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.02 – 1.28
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+group [Teacher]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.93
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.07
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.65 – 3.23
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.98 – 1.17
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+pre_n
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.01
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.25
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.01 – 1.01
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.24 – 0.26
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="5">
+247
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> Nagelkerke
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="5">
+1.000
+</td>
+</tr>
+</table>
+<pre class="r"><code>m1 &lt;- glm(post_n~ 1,
+          data = i,
+          family = &#39;poisson&#39;)
+sjPlot::tab_model(m1, show.std = T)</code></pre>
+<pre><code>## No variables could be standardized.</code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="5" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+post n
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Incidence Rate Ratios
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+std. Beta
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+standardized CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+24.47
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+3.20
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+23.86 – 25.09
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+3.17 – 3.22
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="5">
+247
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> Nagelkerke
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="5">
+0.000
+</td>
+</tr>
+</table>
+<pre class="r"><code>m1b &lt;- glm(post_n_days~ 1,
+          data = i,
+          family = &#39;poisson&#39;)
+sjPlot::tab_model(m1b, show.std = T)</code></pre>
+<pre><code>## No variables could be standardized.</code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="5" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+post n days
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Incidence Rate Ratios
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+std. Beta
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+standardized CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+24.47
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+3.20
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+23.86 – 25.09
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+3.17 – 3.22
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="5">
+247
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> Nagelkerke
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="5">
+0.000
+</td>
+</tr>
+</table>
+<pre class="r"><code># margins::margins(m1b)</code></pre>
 
 
 
