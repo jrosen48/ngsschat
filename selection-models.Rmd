@@ -1,0 +1,114 @@
+---
+title: "Selecton Models"
+author: "JMR"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+params:
+  edgelist: ""
+  users_to_analyze: ""
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
+
+edge <- params$edgelist
+users <- params$users_to_analyze
+```
+
+```{r}
+u <- users %>% 
+  select(-code)
+```
+
+```{r}
+dc <- edge %>%
+  select(sender, receiver, var) %>% 
+  filter(var == "ts")
+
+g <- graph_from_data_frame(dc)
+
+m <- as_adjacency_matrix(g, sparse = FALSE) # sender is row, receiver is column
+
+t <- m %>% 
+  as.data.frame() %>% 
+  rownames_to_column("sender") %>% 
+  gather(receiver, val, -sender) %>% 
+  as_tibble()
+```
+
+```{r}
+tt <- add_users_data(t, u)
+```
+
+```{r}
+tt$group_receiver <- ifelse(tt$group_receiver == "Unclear", "Other", tt$group_receiver)
+tt$group_sender <- ifelse(tt$group_sender == "Unclear", "Other", tt$group_sender)
+
+tt$group_receiver <- fct_relevel(as.factor(tt$group_receiver), "Other")
+tt$group_sender <- fct_relevel(as.factor(tt$group_sender), "Other")
+
+tt$dic <- ifelse(tt$val > 0, 1, 0)
+tt$same <- ifelse(tt$group_sender == tt$group_receiver, 1, 0)
+tt$diff <- ifelse(tt$group_sender != tt$group_receiver, 1, 0)
+```
+
+```{r, m-ts, eval = FALSE}
+mts <- brm(val ~ 1 +
+             group_sender + group_receiver +
+             same +
+             (1|sender) + (1|receiver),
+           iter = 1000, chains = 4, cores = 4,
+           family = 'poisson',
+           data = tt)
+
+mts
+```
+
+```{r}
+u <- users %>% 
+  select(-code)
+```
+
+```{r}
+dc <- edge %>%
+  select(sender, receiver, var) %>% 
+  filter(var == "sb" | var == "tf")
+
+g <- graph_from_data_frame(dc)
+
+m <- as_adjacency_matrix(g, sparse = FALSE) # sender is row, receiver is column
+
+t <- m %>% 
+  as.data.frame() %>% 
+  rownames_to_column("sender") %>% 
+  gather(receiver, val, -sender) %>% 
+  as_tibble()
+```
+
+```{r}
+tt <- add_users_data(t, u)
+```
+
+```{r}
+tt$group_receiver <- ifelse(tt$group_receiver == "Unclear", "Other", tt$group_receiver)
+tt$group_sender <- ifelse(tt$group_sender == "Unclear", "Other", tt$group_sender)
+
+tt$group_receiver <- fct_relevel(as.factor(tt$group_receiver), "Other")
+tt$group_sender <- fct_relevel(as.factor(tt$group_sender), "Other")
+
+tt$dic <- ifelse(tt$val > 0, 1, 0)
+tt$same <- ifelse(tt$group_sender == tt$group_receiver, 1, 0)
+tt$diff <- ifelse(tt$group_sender != tt$group_receiver, 1, 0)
+```
+
+```{r, m-sb, eval = FALSE}
+msb <- brm(val ~ 1 +
+             group_sender + group_receiver +
+             same +
+             (1|sender) + (1|receiver),
+           iter = 1000, chains = 4, cores = 4,
+           family = 'poisson',
+           data = tt)
+
+msb
+```

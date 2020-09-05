@@ -4,8 +4,6 @@ source("R/plan.R")      # creates the drake plan
 
 vis_drake_graph(plan)
 
-utils::browseURL('file:///Users/jrosenb8/ngsschat/docs/index.html')
-
 drake_config(plan, verbose = 2)
 
 # drake::clean()
