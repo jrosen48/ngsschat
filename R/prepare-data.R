@@ -1,14 +1,3 @@
-# proc processed data
-
-# Loading packages
-
-library(tidyverse)
-library(lubridate)
-library(rTAGS)
-library(rtweet)
-library(osfr) # devtools::install_github("centerforopenscience/osfr")   # only need to run once
-library(nominatim)
-
 get_tweet_id <- function (t) {
   t <- str_extract(t, "[0-9]{6,}")
   t

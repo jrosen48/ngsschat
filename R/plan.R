@@ -2,19 +2,23 @@ plan = drake::drake_plan(
   
   # reading data
   
-  raw_qual_coded_data = read_csv(file_in("data/raw-qual-coded-data.csv")),
-  orig_all = read_rds(file_in("data/all-ngsschat-tweets.rds")),
-  users = read_csv(file_in("data/users-to-analyze.csv")),
+  orig_all = read_rds(file_in("data/all-ngsschat-tweets.rds")), # how are these all made? need rtweet from original data
   orig = read_rds(file_in("data/ngsschat-tweets-14-15.rds")),
   orig_pre = read_csv(file_in("data/orig-pre-14.csv")),
   orig_post = read_csv(file_in("data/orig-post-15.csv")),
+  
+  raw_qual_coded_data = read_csv(file_in("data/raw-qual-coded-data.csv")),
+  
   edge = read_csv(file_in("data/edgelist-to-analyze.csv")),
   state_data = read_excel(file_in("data/state-data.xlsx")),
-  locs = read_rds(file_in("data/geocoded-locations.rds")),
+  locs = read_rds(file_in("data/geocoded-locations.rds")), # what makes this?
   coded_threads = read_csv(file_in("data/qual-coded-tweets.csv")),
-  edgelist_of_coded_data = read_csv(file_in("data/edgelist.csv")),
-  all_unfiltered_coded_threads = read_csv(file_in("data/all-unfiltered-coded-threads.csv"), col_types = cols(ID = col_character())),
-  users_to_analyze = read_csv(file_in('data/users-to-analyze.csv')),
+  
+  edgelist_of_coded_data = read_csv(file_in("data/edgelist.csv")), # is this made from edge; or how is this made?
+  
+  all_unfiltered_coded_threads = read_csv(file_in("data/all-unfiltered-coded-threads.csv"), 
+                                          col_types = cols(ID = col_character())), # can this be made from coded threads?
+  users = read_csv(file_in('data/users-to-analyze.csv')),
   
   # processing data
   
@@ -35,7 +39,7 @@ plan = drake::drake_plan(
     knitr_in("descriptive-stats.Rmd"),
     output_file = file_out("docs/preliminary.html"),
     params = list(all_unfiltered_coded_threads = all_unfiltered_coded_threads,
-                  users_to_analyze = users_to_analyze,
+                  users_to_analyze = users,
                   influence = influence)),
   
   conversations_rq1 = rmarkdown::render(
@@ -44,14 +48,14 @@ plan = drake::drake_plan(
     params = list(raw_qual_coded_data = raw_qual_coded_data,
                   coded_threads = coded_threads,
                   all_unfiltered_coded_threads = all_unfiltered_coded_threads,
-                  users_to_analyze = users_to_analyze,
+                  users_to_analyze = users,
                   influence = influence)),
   
   participation_rq2 = rmarkdown::render(
     knitr_in("selection-models.Rmd"),
     output_file = file_out("docs/rq2.html"),
     params = list(edgelist = edgelist_of_coded_data,
-                  users_to_analyze = users_to_analyze)),
+                  users_to_analyze = users)),
   
   sustained_involvement_rq3 = rmarkdown::render(
     knitr_in("influence-models.Rmd"),
@@ -62,9 +66,10 @@ plan = drake::drake_plan(
   ## other documents
   
   drake_graph = rmarkdown::render(
-    knitr_in("drake-graph.Rmd"),
-    output_file = file_out("docs/drake-graph.html")),
+    knitr_in("dependencies.Rmd"),
+    output_file = file_out("docs/dependencies.html")),
   
-  rendered_site = render_site()
+  rendered_site = target(command = render_site(),
+                         trigger = trigger(condition = TRUE))
   
 )

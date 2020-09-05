@@ -686,10 +686,6 @@ transform_edgelist <- function(edgelist, users_data_from_rtweet){
   edgelist_with_all_users_data
 }
 
-render_site <- function() {
-  rmarkdown::render_site("docs")
-}
-
 add_users_data <- function(edgelist, users_data_from_rtweet){
   users_prepped <- dplyr::mutate(users_data_from_rtweet,
                                  screen_name = tolower(screen_name)
@@ -736,4 +732,10 @@ add_users_data <- function(edgelist, users_data_from_rtweet){
                                                    users_prepped,
                                                    by = "screen_name")
   edgelist_with_all_users_data <- dplyr::select(edgelist_with_all_users_data, -screen_name)
+}
+
+render_site <- function() {
+  fs::file_copy("graph.html", new_path = "docs/graph.html", overwrite = TRUE)
+  fs::dir_copy("graph_files", new_path = "docs/graph_files", overwrite = TRUE)
+  rmarkdown::render_site("docs")
 }

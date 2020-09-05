@@ -52,12 +52,12 @@ tt$same <- ifelse(tt$group_sender == tt$group_receiver, 1, 0)
 tt$diff <- ifelse(tt$group_sender != tt$group_receiver, 1, 0)
 ```
 
-```{r, m-ts}
+```{r, m-ts, cache = TRUE, eval = FALSE}
 mts <- brm(val ~ 1 +
              group_sender + group_receiver +
              same +
              (1|sender) + (1|receiver),
-           iter = 2000, chains = 4, cores = 4,
+           iter = 500, chains = 4, cores = 4,
            family = 'poisson',
            data = tt)
 
@@ -101,7 +101,7 @@ tt$same <- ifelse(tt$group_sender == tt$group_receiver, 1, 0)
 tt$diff <- ifelse(tt$group_sender != tt$group_receiver, 1, 0)
 ```
 
-```{r, m-sb}
+```{r, m-sb, cache = TRUE, eval = FALSE}
 msb <- brm(val ~ 1 +
              group_sender + group_receiver +
              same +

@@ -543,10 +543,10 @@
     },
     "glue": {
       "Package": "glue",
-      "Version": "1.4.1",
+      "Version": "1.4.2",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "f43e0d5e85ccb0a4045670c0607ee504"
+      "Hash": "6efd734b14c6471cfe443345f3e35e29"
     },
     "googlesheets": {
       "Package": "googlesheets",
@@ -1325,10 +1325,10 @@
     },
     "tidyr": {
       "Package": "tidyr",
-      "Version": "1.1.1",
+      "Version": "1.1.2",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "a0d8d887f9887f668e3d54d1b820c2a2"
+      "Hash": "c40b2d5824d829190f4b825f4496dfae"
     },
     "tidyselect": {
       "Package": "tidyselect",
@@ -1395,10 +1395,10 @@
     },
     "vctrs": {
       "Package": "vctrs",
-      "Version": "0.3.2",
+      "Version": "0.3.4",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "5ba3006888ac62fd5e97b208d00d3317"
+      "Hash": "0bc90078aeee42f2520b1d0a33bd6758"
     },
     "viridis": {
       "Package": "viridis",

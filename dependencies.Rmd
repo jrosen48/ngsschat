@@ -1,0 +1,8 @@
+---
+title: "Dependencies"
+output: html_document
+---
+
+```{r}
+renv::diagnostics()
+```

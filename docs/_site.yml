@@ -18,6 +18,8 @@ navbar:
   - text: RQ3
     href: rq3.html
   - text: Drake
-    href: drake-graph.html
+    href: graph.html
+  - text: Dependencies
+    href: dependencies.html
 output:
   html_document:
