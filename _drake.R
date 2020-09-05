@@ -4,6 +4,8 @@ source("R/plan.R")      # creates the drake plan
 
 vis_drake_graph(plan)
 
-drake_config(plan, verbose = 2)
+drake_config(plan, 
+             verbose = 2,
+             lock_envir = FALSE)
 
 # drake::clean()

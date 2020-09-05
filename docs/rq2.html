@@ -364,15 +364,15 @@ summary {
 
 <h1 class="title toc-ignore">Selecton Models</h1>
 <h4 class="author">JMR</h4>
-<h4 class="date">04 September, 2020</h4>
+<h4 class="date">05 September, 2020</h4>
 
 </div>
 
 
 <pre class="r"><code>u &lt;- users %&gt;% 
-  select(-code)</code></pre>
+  dplyr::select(-code)</code></pre>
 <pre class="r"><code>dc &lt;- edge %&gt;%
-  select(sender, receiver, var) %&gt;% 
+  dplyr::select(sender, receiver, var) %&gt;% 
   filter(var == &quot;ts&quot;)
 
 g &lt;- graph_from_data_frame(dc)
@@ -398,15 +398,81 @@ tt$diff &lt;- ifelse(tt$group_sender != tt$group_receiver, 1, 0)</code></pre>
              group_sender + group_receiver +
              same +
              (1|sender) + (1|receiver),
-           iter = 1000, chains = 4, cores = 4,
+           iter = 2000, chains = 4, cores = 4,
            family = &#39;poisson&#39;,
-           data = tt)
-
-mts</code></pre>
+           data = tt)</code></pre>
+<pre><code>## Compiling Stan program...</code></pre>
+<pre><code>## Trying to compile a simple C file</code></pre>
+<pre><code>## Running /Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB foo.c
+## clang -mmacosx-version-min=10.13 -I&quot;/Library/Frameworks/R.framework/Resources/include&quot; -DNDEBUG   -I&quot;/Users/jrosenb8/Library/Application Support/renv/cache/v5/R-4.0/x86_64-apple-darwin17.0/Rcpp/1.0.5/125dc7a0ed375eb68c0ce533b48d291f/Rcpp/include/&quot;  -I&quot;/Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/RcppEigen/include/&quot;  -I&quot;/Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/RcppEigen/include/unsupported&quot;  -I&quot;/Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/BH/include&quot; -I&quot;/Users/jrosenb8/Library/Application Support/renv/cache/v5/R-4.0/x86_64-apple-darwin17.0/StanHeaders/2.21.0-6/9da8818e00c8e3fc7c94d707523a0009/StanHeaders/include/src/&quot;  -I&quot;/Users/jrosenb8/Library/Application Support/renv/cache/v5/R-4.0/x86_64-apple-darwin17.0/StanHeaders/2.21.0-6/9da8818e00c8e3fc7c94d707523a0009/StanHeaders/include/&quot;  -I&quot;/Users/jrosenb8/Library/Application Support/renv/cache/v5/R-4.0/x86_64-apple-darwin17.0/RcppParallel/5.0.2/551d50addb18c7b99637aa377a25afc8/RcppParallel/include/&quot;  -I&quot;/Users/jrosenb8/Library/Application Support/renv/cache/v5/R-4.0/x86_64-apple-darwin17.0/rstan/2.21.2/52772d81aa532a6331fd535701882c12/rstan/include&quot; -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DBOOST_NO_AUTO_PTR  -include &#39;/Users/jrosenb8/Library/Application Support/renv/cache/v5/R-4.0/x86_64-apple-darwin17.0/StanHeaders/2.21.0-6/9da8818e00c8e3fc7c94d707523a0009/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp&#39;  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include   -fPIC  -Wall -g -O2  -c foo.c -o foo.o
+## In file included from &lt;built-in&gt;:1:
+## In file included from /Users/jrosenb8/Library/Application Support/renv/cache/v5/R-4.0/x86_64-apple-darwin17.0/StanHeaders/2.21.0-6/9da8818e00c8e3fc7c94d707523a0009/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
+## In file included from /Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/RcppEigen/include/Eigen/Dense:1:
+## In file included from /Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/RcppEigen/include/Eigen/Core:88:
+## /Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/RcppEigen/include/Eigen/src/Core/util/Macros.h:613:1: error: unknown type name &#39;namespace&#39;
+## namespace Eigen {
+## ^
+## /Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/RcppEigen/include/Eigen/src/Core/util/Macros.h:613:16: error: expected &#39;;&#39; after top level declarator
+## namespace Eigen {
+##                ^
+##                ;
+## In file included from &lt;built-in&gt;:1:
+## In file included from /Users/jrosenb8/Library/Application Support/renv/cache/v5/R-4.0/x86_64-apple-darwin17.0/StanHeaders/2.21.0-6/9da8818e00c8e3fc7c94d707523a0009/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
+## In file included from /Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/RcppEigen/include/Eigen/Dense:1:
+## /Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/RcppEigen/include/Eigen/Core:96:10: fatal error: &#39;complex&#39; file not found
+## #include &lt;complex&gt;
+##          ^~~~~~~~~
+## 3 errors generated.
+## make: *** [foo.o] Error 1</code></pre>
+<pre><code>## Start sampling</code></pre>
+<pre class="r"><code>mts</code></pre>
+<pre><code>##  Family: poisson 
+##   Links: mu = log 
+## Formula: val ~ 1 + group_sender + group_receiver + same + (1 | sender) + (1 | receiver) 
+##    Data: tt (Number of observations: 29929) 
+## Samples: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+##          total post-warmup samples = 4000
+## 
+## Group-Level Effects: 
+## ~receiver (Number of levels: 173) 
+##               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+## sd(Intercept)     1.01      0.07     0.87     1.16 1.01      986     1694
+## 
+## ~sender (Number of levels: 173) 
+##               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+## sd(Intercept)     1.54      0.13     1.31     1.81 1.00     1044     1766
+## 
+## Population-Level Effects: 
+##                             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+## Intercept                      -7.17      0.37    -7.90    -6.44 1.00     1323
+## group_senderAdministrator       1.29      0.41     0.49     2.12 1.00     1058
+## group_senderOrganization        0.45      0.65    -0.86     1.70 1.00     1453
+## group_senderResearcher          1.55      0.58     0.39     2.70 1.00     1168
+## group_senderTeacher             1.01      0.38     0.26     1.77 1.00     1028
+## group_receiverAdministrator     0.87      0.26     0.36     1.38 1.00     1238
+## group_receiverOrganization      0.68      0.40    -0.11     1.46 1.00     1347
+## group_receiverResearcher        1.30      0.37     0.60     2.00 1.00      941
+## group_receiverTeacher           0.65      0.24     0.18     1.11 1.00     1208
+## same                            0.02      0.07    -0.12     0.17 1.00     6687
+##                             Tail_ESS
+## Intercept                       2000
+## group_senderAdministrator       2017
+## group_senderOrganization        2493
+## group_senderResearcher          1791
+## group_senderTeacher             1745
+## group_receiverAdministrator     2127
+## group_receiverOrganization      2244
+## group_receiverResearcher        1989
+## group_receiverTeacher           2019
+## same                            2856
+## 
+## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
+## and Tail_ESS are effective sample size measures, and Rhat is the potential
+## scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <pre class="r"><code>u &lt;- users %&gt;% 
-  select(-code)</code></pre>
+  dplyr::select(-code)</code></pre>
 <pre class="r"><code>dc &lt;- edge %&gt;%
-  select(sender, receiver, var) %&gt;% 
+  dplyr::select(sender, receiver, var) %&gt;% 
   filter(var == &quot;sb&quot; | var == &quot;tf&quot;)
 
 g &lt;- graph_from_data_frame(dc)
@@ -432,11 +498,78 @@ tt$diff &lt;- ifelse(tt$group_sender != tt$group_receiver, 1, 0)</code></pre>
              group_sender + group_receiver +
              same +
              (1|sender) + (1|receiver),
-           iter = 1000, chains = 4, cores = 4,
+           iter = 2000, chains = 4, cores = 4,
            family = &#39;poisson&#39;,
-           data = tt)
-
-msb</code></pre>
+           data = tt)</code></pre>
+<pre><code>## Compiling Stan program...</code></pre>
+<pre><code>## recompiling to avoid crashing R session</code></pre>
+<pre><code>## Trying to compile a simple C file</code></pre>
+<pre><code>## Running /Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB foo.c
+## clang -mmacosx-version-min=10.13 -I&quot;/Library/Frameworks/R.framework/Resources/include&quot; -DNDEBUG   -I&quot;/Users/jrosenb8/Library/Application Support/renv/cache/v5/R-4.0/x86_64-apple-darwin17.0/Rcpp/1.0.5/125dc7a0ed375eb68c0ce533b48d291f/Rcpp/include/&quot;  -I&quot;/Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/RcppEigen/include/&quot;  -I&quot;/Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/RcppEigen/include/unsupported&quot;  -I&quot;/Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/BH/include&quot; -I&quot;/Users/jrosenb8/Library/Application Support/renv/cache/v5/R-4.0/x86_64-apple-darwin17.0/StanHeaders/2.21.0-6/9da8818e00c8e3fc7c94d707523a0009/StanHeaders/include/src/&quot;  -I&quot;/Users/jrosenb8/Library/Application Support/renv/cache/v5/R-4.0/x86_64-apple-darwin17.0/StanHeaders/2.21.0-6/9da8818e00c8e3fc7c94d707523a0009/StanHeaders/include/&quot;  -I&quot;/Users/jrosenb8/Library/Application Support/renv/cache/v5/R-4.0/x86_64-apple-darwin17.0/RcppParallel/5.0.2/551d50addb18c7b99637aa377a25afc8/RcppParallel/include/&quot;  -I&quot;/Users/jrosenb8/Library/Application Support/renv/cache/v5/R-4.0/x86_64-apple-darwin17.0/rstan/2.21.2/52772d81aa532a6331fd535701882c12/rstan/include&quot; -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DBOOST_NO_AUTO_PTR  -include &#39;/Users/jrosenb8/Library/Application Support/renv/cache/v5/R-4.0/x86_64-apple-darwin17.0/StanHeaders/2.21.0-6/9da8818e00c8e3fc7c94d707523a0009/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp&#39;  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include   -fPIC  -Wall -g -O2  -c foo.c -o foo.o
+## In file included from &lt;built-in&gt;:1:
+## In file included from /Users/jrosenb8/Library/Application Support/renv/cache/v5/R-4.0/x86_64-apple-darwin17.0/StanHeaders/2.21.0-6/9da8818e00c8e3fc7c94d707523a0009/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
+## In file included from /Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/RcppEigen/include/Eigen/Dense:1:
+## In file included from /Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/RcppEigen/include/Eigen/Core:88:
+## /Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/RcppEigen/include/Eigen/src/Core/util/Macros.h:613:1: error: unknown type name &#39;namespace&#39;
+## namespace Eigen {
+## ^
+## /Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/RcppEigen/include/Eigen/src/Core/util/Macros.h:613:16: error: expected &#39;;&#39; after top level declarator
+## namespace Eigen {
+##                ^
+##                ;
+## In file included from &lt;built-in&gt;:1:
+## In file included from /Users/jrosenb8/Library/Application Support/renv/cache/v5/R-4.0/x86_64-apple-darwin17.0/StanHeaders/2.21.0-6/9da8818e00c8e3fc7c94d707523a0009/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
+## In file included from /Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/RcppEigen/include/Eigen/Dense:1:
+## /Users/jrosenb8/ngsschat/renv/library/R-4.0/x86_64-apple-darwin17.0/RcppEigen/include/Eigen/Core:96:10: fatal error: &#39;complex&#39; file not found
+## #include &lt;complex&gt;
+##          ^~~~~~~~~
+## 3 errors generated.
+## make: *** [foo.o] Error 1</code></pre>
+<pre><code>## Start sampling</code></pre>
+<pre class="r"><code>msb</code></pre>
+<pre><code>##  Family: poisson 
+##   Links: mu = log 
+## Formula: val ~ 1 + group_sender + group_receiver + same + (1 | sender) + (1 | receiver) 
+##    Data: tt (Number of observations: 40000) 
+## Samples: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+##          total post-warmup samples = 4000
+## 
+## Group-Level Effects: 
+## ~receiver (Number of levels: 200) 
+##               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+## sd(Intercept)     1.56      0.10     1.37     1.76 1.01      384      742
+## 
+## ~sender (Number of levels: 200) 
+##               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+## sd(Intercept)     1.63      0.11     1.43     1.85 1.01      259      635
+## 
+## Population-Level Effects: 
+##                             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+## Intercept                      -5.69      0.35    -6.41    -5.03 1.01      276
+## group_senderAdministrator       0.91      0.38     0.17     1.63 1.01      172
+## group_senderOrganization       -0.39      0.66    -1.70     0.91 1.01      533
+## group_senderResearcher          0.72      0.50    -0.26     1.70 1.01      268
+## group_senderTeacher             0.37      0.31    -0.25     0.97 1.01      170
+## group_receiverAdministrator     0.89      0.32     0.23     1.54 1.01      287
+## group_receiverOrganization      0.10      0.60    -1.08     1.31 1.00      536
+## group_receiverResearcher        0.83      0.47    -0.09     1.76 1.01      363
+## group_receiverTeacher           0.27      0.30    -0.29     0.88 1.02      296
+## same                            0.10      0.04     0.02     0.17 1.00     3453
+##                             Tail_ESS
+## Intercept                        530
+## group_senderAdministrator        479
+## group_senderOrganization        1025
+## group_senderResearcher           621
+## group_senderTeacher              423
+## group_receiverAdministrator      685
+## group_receiverOrganization      1064
+## group_receiverResearcher         662
+## group_receiverTeacher            477
+## same                            2600
+## 
+## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
+## and Tail_ESS are effective sample size measures, and Rhat is the potential
+## scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 
 
 
