@@ -108,7 +108,7 @@ i %>%
   arrange(desc(prop_n_users))
 
 mts <- glm(post_n ~ 1 +
-            exposure_sum_std+ exposure_sum_sb_std + group,
+            exposure_sum_std + exposure_sum_sb_std + group,
           data = i,
           family = 'poisson')
 
@@ -120,10 +120,10 @@ sjPlot::tab_model(mts)
 g <- multcomp::glht(mts, multcomp::mcp(group="Tukey"))
 g
 msb <- glm(post_n ~ 1 +
-             exposure_sum_sb_std++ group + pre_n,
+             exposure_sum_sb_std+ group + pre_n,
            data = i,
            family = 'poisson')
-sjPlot::tab_model(mts, show.std = T)
+
 sjPlot::tab_model(msb, show.std = T)
 ```
 

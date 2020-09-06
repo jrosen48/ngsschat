@@ -12,8 +12,8 @@ project <- osf_retrieve_node("https://osf.io/9ex7k/")
 
 # Getting data 
 
-osf_retrieve_file("https://osf.io/j5a28/") %>% 
-  osf_download(path = "0_orig_tweets.csv", overwrite = FALSE)
+# osf_retrieve_file("https://osf.io/j5a28/") %>% 
+#   osf_download(path = "0_orig_tweets.csv", overwrite = FALSE)
 
 osf_retrieve_file("https://osf.io/fuh8z/") %>% 
   osf_download(path = "ngsschat-code-profiles.csv", overwrite = FALSE)
@@ -32,8 +32,8 @@ p <- read_csv("ngsschat-code-profiles.csv")
 # # scraped_tweets <- read_csv("raw-tweets.csv")
 # # rtweet_tweets <- lookup_statuses(as.character(scraped_tweets$id)) # for caching
 
-orig_rtweet <- read_rds("all-ngsschat-tweets.rds")
-
+# orig_rtweet <- read_rds("all-ngsschat-tweets.rds")
+orig_rtweet <- orig
 orig_rtweet$status_id <- get_tweet_id(orig_rtweet$status_url)
 
 # data_frame(lll = lll, )
@@ -43,7 +43,7 @@ orig_rtweet$status_id <- get_tweet_id(orig_rtweet$status_url)
 
 orig_rtweet <- mutate(orig_rtweet, screen_name = tolower(screen_name))
 
-orig_rtweet$day <- round_date(orig_rtweet$created_at, "day")
+orig_rtweet$day <- lubridate::round_date(orig_rtweet$created_at, "day")
 
 orig_rtweet %>% 
   filter(day >= '2014-08-01' & day < '2015-07-31') %>% 
@@ -79,13 +79,13 @@ users <- users %>%
   left_join(users_n_tweets) %>% 
   left_join(users_n_days)
 
-p <- p %>% 
-  filter(Code != 0) %>% 
-  mutate(screen_name = tolower(screen_name)) %>% 
-  select(screen_name, code = Code, code_category = Category)
-
-users <- users %>% 
-  left_join(p, by = "screen_name")
+# p <- p %>% 
+#   filter(Code != 0) %>% 
+#   mutate(screen_name = tolower(screen_name)) %>% 
+#   select(screen_name, code = Code, code_category = Category)
+# 
+# users <- users %>% 
+#   left_join(p, by = "screen_name")
 
 users <- users %>%
   filter(n_tweets > 1)

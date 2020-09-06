@@ -2,10 +2,10 @@ plan = drake::drake_plan(
   
   # reading data
   
-  orig_all = read_rds(file_in("data/all-ngsschat-tweets.rds")), # how are these all made? need rtweet from original data
-  orig = read_rds(file_in("data/ngsschat-tweets-14-15.rds")),
-  orig_pre = read_csv(file_in("data/orig-pre-14.csv")),
-  orig_post = read_csv(file_in("data/orig-post-15.csv")),
+  orig_all = process_raw_tweets("data-raw/original-storify-data.csv"),
+  
+  orig = create_orig(orig_all),
+  orig_post = create_orig_post(orig_all),
   
   raw_qual_coded_data = read_csv(file_in("data/raw-qual-coded-data.csv")),
   
@@ -16,24 +16,26 @@ plan = drake::drake_plan(
   
   edgelist_of_coded_data = read_csv(file_in("data/edgelist.csv")), # is this made from edge; or how is this made?
   
-  all_unfiltered_coded_threads = read_csv(file_in("data/all-unfiltered-coded-threads.csv"), 
-                                          col_types = cols(ID = col_character())), # can this be made from coded threads?
+  all_unfiltered_coded_threads = read_csv(file_in("data/all-unfiltered-coded-threads.csv"), col_types = cols(ID = col_character())), # can this be made from coded threads?
   users = read_csv(file_in('data/users-to-analyze.csv')),
   
   # processing data
   
   fixed_coded_threads = fix_codes(coded_threads),
-  ts_plot = create_time_series(orig_all),
-  states_proc = create_location_plot_and_return_users(locs, state_data),
-  sociogram_plot = create_sociogram(edge, users),
-  descriptive_stats = create_descriptive_stats(users, orig, states),
-  proc_users = proc_users_data_for_locations(users, locs, states_proc),
-  influence = prepare_for_influence(orig_pre, orig_post, proc_users, edge),
+  # influence = prepare_for_influence(orig_post, proc_users, edge), # I don't think this is used; can rep with users
   proc_coded_threads = prepare_coded_threads(fixed_coded_threads, influence),
+  
+  # sociogram_plot = create_sociogram(edge, users),
+  # descriptive_stats = create_descriptive_stats(users, orig, states),
+  # proc_users = proc_users_data_for_locations(users, locs, states_proc), # can this be used for influence? is it needed
+
   
   # RMD documents
   
   ## results
+  
+  ts_plot = create_time_series(orig_all), # move to descriptive
+  states_proc = create_location_plot_and_return_users(locs, state_data), # move to descriptives
   
   preliminary_results = rmarkdown::render(
     knitr_in("descriptive-stats.Rmd"),

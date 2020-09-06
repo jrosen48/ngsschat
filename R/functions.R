@@ -259,20 +259,7 @@ proc_users_data_for_locations <- function(users, l, states) {
 }
 
 
-prepare_for_influence <- function(orig_pre, orig_post, users, edge) {
-  n_days <- orig_pre %>% 
-    mutate(screen_name = tolower(screen_name)) %>% 
-    filter(!is_retweet) %>% 
-    count(screen_name, day) %>% 
-    count(screen_name) %>% 
-    dplyr::select(screen_name, pre_n_days = n)
-  
-  orig_prep <- orig_pre %>% 
-    mutate(screen_name = tolower(screen_name)) %>% 
-    filter(!is_retweet) %>% 
-    count(screen_name) %>% 
-    dplyr::select(screen_name, pre_n = n) %>% 
-    left_join(n_days)
+prepare_for_influence <- function(orig_post, users, edge) {
   
   n_days <- orig_post %>% 
     mutate(screen_name = tolower(screen_name)) %>% 
@@ -289,14 +276,10 @@ prepare_for_influence <- function(orig_pre, orig_post, users, edge) {
     left_join(n_days)
   
   d_for_influence <- users %>% 
-    left_join(orig_prep) %>% 
-    left_join(orig_postp) %>% 
     distinct(screen_name, .keep_all = TRUE) %>% 
     dplyr::select(screen_name, pre_n, pre_n_days, n_tweets, post_n, post_n_days) %>% 
     filter(n_tweets > 1) %>% 
     mutate_all(replace_na, 0)
-  
-  orig_pre <- rename(orig_pre, sender = screen_name)
   
   edge <- edge %>% 
     mutate(sender = tolower(sender),
@@ -305,7 +288,6 @@ prepare_for_influence <- function(orig_pre, orig_post, users, edge) {
   influence_endorsing <- edge %>% 
     filter(interaction_type == "endorsing") %>% 
     count(sender, receiver) %>% 
-    left_join(rename(orig_prep, sender = screen_name)) %>% 
     mutate(exposure = n * pre_n) %>% 
     group_by(receiver) %>% 
     summarize(exposure_sum_end = sum(exposure, na.rm = TRUE)) %>% 
@@ -318,7 +300,6 @@ prepare_for_influence <- function(orig_pre, orig_post, users, edge) {
   influence_endorsing_n <- edge %>% 
     filter(interaction_type == "endorsing") %>% 
     count(sender, receiver) %>% 
-    left_join(rename(orig_prep, sender = screen_name)) %>% 
     mutate(exposure = n) %>% 
     group_by(receiver) %>% 
     summarize(exposure_sum_end = sum(exposure, na.rm = TRUE)) %>% 
@@ -331,7 +312,6 @@ prepare_for_influence <- function(orig_pre, orig_post, users, edge) {
   influence_conversing <- edge %>% 
     filter(interaction_type == "conversing") %>% 
     count(sender, receiver) %>% 
-    left_join(rename(orig_prep, sender = screen_name)) %>% 
     mutate(exposure = n * pre_n) %>% 
     group_by(receiver) %>% 
     summarize(exposure_sum_conv = sum(exposure, na.rm = TRUE)) %>% 
@@ -344,7 +324,6 @@ prepare_for_influence <- function(orig_pre, orig_post, users, edge) {
   influence_conversing_n <- edge %>% 
     filter(interaction_type == "conversing") %>% 
     count(sender, receiver) %>% 
-    left_join(rename(orig_prep, sender = screen_name)) %>% 
     mutate(exposure = n) %>% 
     group_by(receiver) %>% 
     summarize(exposure_sum_conv = sum(exposure, na.rm = TRUE)) %>% 
