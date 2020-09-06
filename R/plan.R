@@ -2,22 +2,27 @@ plan = drake::drake_plan(
   
   # reading data
   
-  orig_all = process_raw_tweets("data-raw/original-storify-data.csv"),
+  orig_all = process_raw_tweets(file_in("data-raw/original-storify-data.csv"))
   
-  orig = create_orig(orig_all),
-  orig_post = create_orig_post(orig_all),
+  orig = create_orig(orig_all)
+  orig_post = create_orig_post(orig_all)
+  
+  professional_role_codes = read_csv(file_in("data-raw/ngsschat-code-profiles.csv"))
+  
+  users = create_users(orig, professional_role_codes)
   
   raw_qual_coded_data = read_csv(file_in("data/raw-qual-coded-data.csv")),
   
   edge = read_csv(file_in("data/edgelist-to-analyze.csv")),
   state_data = read_excel(file_in("data/state-data.xlsx")),
-  locs = read_rds(file_in("data/geocoded-locations.rds")), # what makes this?
+  
+  locs = geocode_locs(users)
   coded_threads = read_csv(file_in("data/qual-coded-tweets.csv")),
   
   edgelist_of_coded_data = read_csv(file_in("data/edgelist.csv")), # is this made from edge; or how is this made?
   
   all_unfiltered_coded_threads = read_csv(file_in("data/all-unfiltered-coded-threads.csv"), col_types = cols(ID = col_character())), # can this be made from coded threads?
-  users = read_csv(file_in('data/users-to-analyze.csv')),
+
   
   # processing data
   
@@ -28,7 +33,7 @@ plan = drake::drake_plan(
   # sociogram_plot = create_sociogram(edge, users),
   # descriptive_stats = create_descriptive_stats(users, orig, states),
   # proc_users = proc_users_data_for_locations(users, locs, states_proc), # can this be used for influence? is it needed
-
+  
   
   # RMD documents
   

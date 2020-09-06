@@ -12,8 +12,9 @@ process_raw_tweets <- function(f) {
   
   d <- read_csv("data-raw/rtweet-processed-tweets.csv")
   d$created_at <- lubridate::with_tz(d$created_at, "EST")
-  d$status_id <- get_tweet_id(orig$status_url)
-  
+  d$status_id <- get_tweet_id(d$status_url)
+  d$screen_name <- tolower(d$screen_name)
+  d
 }
 
 # read_rds("data-raw/all-ngsschat-tweets.rds") %>% 
@@ -29,8 +30,8 @@ process_raw_tweets <- function(f) {
 
 create_orig <- function(d) {
   orig <- d %>% 
-    filter(created_at >= lubridate::ymd("2014-08-01"),
-           created_at <= lubridate::ymd("2015-07-31")) %>% 
+    dplyr::filter(created_at >= lubridate::ymd("2014-08-01"),
+                  created_at <= lubridate::ymd("2015-07-31")) %>% 
     arrange(created_at)
 }
 
