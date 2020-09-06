@@ -47,26 +47,7 @@ create_users <- function(orig, professional_role_codes) {
   users <- users %>%
     filter(n_tweets > 1)
   
-  users
+  users %>% 
+    filter(screen_name != "etnyresci") # this user w/ two tweets was removed from the data inadvertently 
+  
 }
-
-orig_all = process_raw_tweets("data-raw/original-storify-data.csv")
-
-orig = create_orig(orig_all)
-# orig_post = create_orig_post(orig_all)
-
-professional_role_codes = read_csv("data-raw/ngsschat-code-profiles.csv")
-
-users = create_users(orig, professional_role_codes)
-
-users_o <- readd(users) %>% arrange(screen_name)
-
-not_in <- users[!(users$screen_name %in% users_o$screen_name), ]
-
-not_in
-
-orig %>%
-  filter(screen_name %in% not_in$screen_name)
-
-orig %>% 
-  filter(screen_name %in% not_in$screen_name) %>% View()
