@@ -17,7 +17,6 @@ process_raw_tweets <- function(f) {
   d
 }
 
-
 create_orig <- function(d) {
   orig <- d %>% 
     dplyr::filter(created_at >= lubridate::ymd("2014-08-01"),

@@ -363,7 +363,7 @@ prepare_for_influence <- function(orig_post, users, edge) {
 }
 
 fix_codes <- function(coded_threads) {
-  # for the two tweets codes that didn't get coded correctly, somehow
+  # for the two tweets' codes that were not coded somehow but should be SB
   coded_threads <- mutate(coded_threads,
                           code = if_else(is.na(code), "SB", code))
   coded_threads

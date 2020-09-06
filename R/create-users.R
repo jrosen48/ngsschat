@@ -48,6 +48,9 @@ create_users <- function(orig, professional_role_codes) {
     filter(n_tweets > 1)
   
   users %>% 
-    filter(screen_name != "etnyresci") # this user w/ two tweets was removed from the data inadvertently 
+    filter(screen_name != "etnyresci") # this user w/ two tweets was removed from the dataset inadvertently 
   
 }
+
+usersn <- readd(orig) %>% 
+  create_users(professional_role_codes)

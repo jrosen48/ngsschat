@@ -1,0 +1,275 @@
+---
+title: 'Accessing #NGSSchat Data'
+output: html_document
+---
+
+
+# Loading the data and setting up
+
+This section loads the data and packages and starts to process the data, but doesn't calculate any statistics or create any results.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+usethis::use_git_ignore(c("*.csv", "*.rds"))
+```
+
+## Loading packages
+
+```{r, include=FALSE}
+library(tidyverse)
+library(rtweet)
+library(usethis)
+```
+
+## Getting data from Open Science Framework
+
+For notes on this one-time setup, see this walkthrough: http://centerforopenscience.github.io/osfr/articles/auth.html)
+
+First, you must generate an API token from an OSF account that has been added to the data repository. Read how to do this here: https://developer.osf.io/#tag/General-Usage
+
+Then, you need to add the OSF API token to the `.renviron` file, which is created using the following command. Here, the file is created at the user level, although this could also be set to the project level. 
+
+```{r, eval = FALSE}
+usethis::edit_r_environ(scope='user')
+```
+
+Open the `.renviron` file and add a single line, using this exact text but replacing `<token>` with your OSF API token:  
+`OSF_PAT="<token>"`
+
+Save the file, quit R, and restart in a new session. Continue running the R script from here.
+
+Now, install the `osfr` package and load the library:
+
+```{r, eval = FALSE}
+devtools::install_github("centerforopenscience/osfr")   # only need to run once
+library(osfr)
+```
+
+Upon loading the `osfr` package, you should see this message:  
+`Automatically registered OSF personal access token.` 
+
+Now you are able to retrieve and download the relevant dataset with this code:
+
+```{r, eval = FALSE}
+# to upload the data
+# project <- osfr::osf_retrieve_node("vk67n")
+# osfr::osf_upload(project, path = "all-ngsschat-tweets-flattened.csv")
+# osfr::osf_upload(project, path = "accessing-ngsschat-data.Rmd", overwrite = TRUE)
+
+library(osfr)
+
+osf_retrieve_file("https://osf.io/pxmfc/") %>% 
+  osf_download(path = "all-ngsschat-tweets-flattened.csv", overwrite = TRUE)
+
+osf_retrieve_file("https://osf.io/9ex7k/") %>% 
+  osf_download(path = "all-ngsschat-tweets.rds", overwrite = TRUE)
+```
+
+## Loading the data
+
+Note that we first processed data collected via TAGS (tags.hawksey.info) in order to obtain the tweet IDs, which we then passed to the `lookup_statuses()` rtweet function. We also processed that data to join it with LIWC data and to remove identifying information.
+
+```{r}
+d <- read_rds("all-ngsschat-tweets.rds")
+
+# d$status_id <- str_split(d$status_url, "/") %>% 
+# map_chr(~.[[6]])
+```
+
+```{r}
+library(rtweet)
+get_replies_recursive <- function(statuses, existing_data = NULL) {
+  statuses <- statuses[!is.na(statuses)] # this line removes the NAs, which are very common because most Tweets are not replies
+  new_data <- lookup_statuses(statuses)
+  
+  print(paste0("Accessed ", nrow(new_data), " new Tweets"))
+  
+  new_statuses <- new_data$reply_to_status_id[!is.na(new_data$reply_to_status_id)]
+  
+  if (is.null(existing_data)) {
+    out_data <- new_data
+  } else {
+    out_data <- rbind(new_data, existing_data)
+  }
+  
+  if (length(new_statuses) > 1) {
+    # this is the key line where the function calls itself, but passing new statuses
+    get_replies_recursive(new_statuses, existing_data = out_data)
+  } else {
+    print(paste0("Accessed ", nrow(out_data), " new Tweets in total"))
+    return(out_data)
+  }
+}
+```
+
+```{r}
+o <- get_replies_recursive(d$reply_to_status_id)
+dd <- rbind(d, o)
+```
+
+```{r}
+dd <- dd %>% 
+  mutate(day = lubridate::round_date(created_at, "day")) 
+
+dd %>% 
+  count(day) %>% 
+  arrange(n)
+
+d1415 <- dd %>% 
+  filter(day < as.POSIXct(as.Date(c("2015-08-01"))),
+         day >= as.POSIXct(as.Date("2014-07-31"))) 
+```
+
+```{r}
+d1415 <- d1415 %>% 
+  # semi_join(day_counts) %>% 
+  distinct(status_id, .keep_all = TRUE)
+
+d1415 <- d1415 %>% 
+  arrange(desc(created_at))
+```
+
+```{r}
+thread_finder <- function(status_id, d, out_statuses = NULL) {
+  
+  status_is_a_reply_to <- as.character(d[d$status_id == status_id, ]$reply_to_status_id)
+  
+  status_is_a_reply_to <- ifelse(length(status_is_a_reply_to) == 0, NA, status_is_a_reply_to)
+  
+  if (!is.na(status_is_a_reply_to)) {
+    
+    if (is.null(out_statuses)) {
+      out_statuses <- c(status_id, status_is_a_reply_to)  
+    } else {
+      out_statuses <- c(out_statuses, status_is_a_reply_to)
+    }
+    
+    thread_finder(status_is_a_reply_to, d, out_statuses)  
+  } else {
+    #out_statuses <- c(out_statuses, status_id)
+    return(out_statuses)
+  }
+}
+```
+
+```{r}
+o <- map(d1415$status_id, thread_finder, d = dd)
+```
+
+```{r}
+dx <- tibble(ID = 1:length(o))
+
+dx$thread <- o
+
+dxx <- dx %>% 
+  unnest(thread)
+```
+
+```{r}
+dxx <- dxx %>% 
+  group_by(ID) %>% 
+  mutate(thread_string = toString(thread))
+
+dxx <- dxx %>% 
+  select(ID, thread_string) %>% 
+  distinct(thread_string, .keep_all = TRUE) %>% 
+  ungroup()
+
+dxx$row_number <- 1:nrow(dxx)
+```
+
+```{r}
+remove_short_threads <- function(thread, d, i) {
+  same_thread <- which(str_detect(d$thread_string, thread))
+  
+  same_thread_df <- d[same_thread, "thread_string"]
+  
+  same_thread_df <- same_thread_df %>%
+    mutate(length_of_string = nchar(thread_string)) %>%
+    arrange(desc(length_of_string))
+  
+  #print(same_thread)
+  
+  print(i)
+  
+  the_longest_thread <- pull(same_thread_df[1, "thread_string"])
+  
+  #print(str_c("thread: ", thread))
+  #print(str_c("longest: ", the_longest_thread))
+  
+  if (!(the_longest_thread == thread)) {
+    print("searching recursively")
+    remove_short_threads(the_longest_thread, d = d, i = i)
+  } else {
+    the_longest_thread
+  }
+}
+
+o <- map2(.x = dxx$thread_string, .f = remove_short_threads, d = dxx, .y = 1:nrow(dxx))
+
+```
+
+```{r}
+oo <- unique(o)
+ox <- tibble(ID = 1:length(oo))
+ox$thread_string = map_chr(oo, ~.)
+```
+
+```{r}
+tj <- ox %>%  
+  select(-ID) %>% 
+  left_join(dxx) %>% 
+  select(ID, thread_string) %>% 
+  mutate(thread_string = str_split(thread_string, ", ")) %>% 
+  unnest(thread_string) %>% 
+  rename(status_id = thread_string)
+
+tjj <- tj %>% 
+  group_by(status_id) %>% 
+  summarize(id_string = toString(ID)) %>% 
+  mutate(id_string = str_split(id_string, ", ")) %>% 
+  unnest(id_string) %>% 
+  mutate(status_id = as.character(status_id)) %>% 
+  mutate(id_string = str_pad(id_string, 4, pad = "0"))
+
+# 6 and 7
+```
+
+```{r}
+mx <- d1415 %>% 
+  left_join(tjj) %>% 
+  arrange(created_at) %>% 
+  mutate(id_factor = as.integer(fct_inorder(as.factor(id_string), ordered = TRUE))) %>% 
+  mutate(id_factor = str_pad(as.character(id_factor), 4, pad = "0"))
+
+mxx <- mx %>% distinct(id_factor, status_id, .keep_all = TRUE)
+```
+
+```{r}
+mxx <- mxx %>% 
+  mutate(date = lubridate::ymd(lubridate::round_date(created_at, "day")),
+         time = hms::as_hms(mxx$created_at))
+
+mxx <- mxx %>% 
+  select(status_id, date, time, screen_name, text, reply_to_status_id, is_quote, is_retweet, favorite_count, retweet_count, mentions_screen_name, quoted_status_id, quoted_screen_name, retweet_status_id, status_url, id_string, id_factor)
+
+mxx <- mxx %>% 
+  mutate(code = NA) %>% 
+  select(code, everything())
+
+mxx <- read_rds("~/ngsschat-shiny/mxx.rds")
+mxx <- mxx %>% 
+  mutate(code = if_else(str_detect(text, "^[aA][1-9]"), "answer",
+                        ifelse(str_detect(text, "^[qQ][1-9]"), "question",
+                               ifelse(!is.na(id_string), "thread", "unclear"))))
+
+mxx %>% 
+  count(code)
+
+mxxx <- filter(mxx, code == "unclear")
+```
+
+```{r}
+write_rds(mxx, "~/ngsschat-shiny/mxx.rds")
+write_rds(mxxx, "~/ngsschat-shiny/mxxx.rds")
+```
