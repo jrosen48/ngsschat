@@ -310,6 +310,13 @@
       "Repository": "CRAN",
       "Hash": "0f22be39ec1d141fd03683c06f3a6e67"
     },
+    "conflicted": {
+      "Package": "conflicted",
+      "Version": "1.0.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "43c5107cc96f47043a56736768ecc59d"
+    },
     "cowplot": {
       "Package": "cowplot",
       "Version": "1.0.0",
@@ -891,6 +898,18 @@
       "Repository": "CRAN",
       "Hash": "2737faeee353704efec5afa1e943dd64"
     },
+    "nominatim": {
+      "Package": "nominatim",
+      "Version": "0.2.2.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "nominatim",
+      "RemoteUsername": "hrbrmstr",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "5c2baa9da26bc81eb769c39f6eb64fa81db01d34",
+      "Hash": "577da3d70b974b6006d258c4b7769f65"
+    },
     "numDeriv": {
       "Package": "numDeriv",
       "Version": "2016.8-1.1",
@@ -925,6 +944,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "5a481ac5dbfb55313c1b8a0dd4ccc688"
+    },
+    "pbapply": {
+      "Package": "pbapply",
+      "Version": "1.4-3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "52f8028b028076bc3b7ee5d6251abf0d"
     },
     "performance": {
       "Package": "performance",

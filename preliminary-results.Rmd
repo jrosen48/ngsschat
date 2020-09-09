@@ -6,7 +6,6 @@ output: html_document
 params:
   all_unfiltered_coded_threads: ""
   users_to_analyze: ""
-  influence: ""
 ---
 
 ```{r setup, include=FALSE}
@@ -16,15 +15,11 @@ knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
 ```{r}
 d <- params$all_unfiltered_coded_threads
 u <- params$users_to_analyze
-i <- params$influence
 ```
 
 ```{r}
 u <- u %>% 
   select(-code)
-
-i <- i %>% 
-  select(screen_name, adoption_tri)
 
 d <- d %>% mutate(screen_name = tolower(screen_name))
 dd <- d %>% 

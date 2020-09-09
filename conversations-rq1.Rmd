@@ -8,7 +8,6 @@ params:
   coded_threads: ""
   all_unfiltered_coded_threads: ""
   users_to_analyze: ""
-  influence: ""
 ---
 
 ```{r setup, include=FALSE, eval = TRUE}
@@ -56,7 +55,6 @@ qa_rows + uc_rows
 ```{r}
 d <- params$all_unfiltered_coded_threads
 u <- params$users_to_analyze
-influence <- params$influence
 ```
 
 ```{r}
@@ -64,9 +62,6 @@ influence <- params$influence
 
 u <- u %>% 
   select(-code)
-
-i <- influence %>% 
-  select(screen_name, adoption_tri)
 
 d <- d %>% mutate(screen_name = tolower(screen_name))
 dd <- d %>% 
@@ -148,44 +143,6 @@ n_group_sd <- dd %>%
 
 n_group_mean
 n_group_sd
-```
-
-# N adoption statuses
-
-```{r}
-dd <- dd %>% 
-  mutate(adoption_tri = as.character(adoption_tri)) %>% 
-  mutate(adoption_tri_c = if_else(is.na(adoption_tri), "missing", adoption_tri))
-
-# mean
-n_adoption_mean <- dd %>% 
-  filter(!(str_detect(ID, "uc") | str_detect(ID, "qa"))) %>% 
-  count(ID, adoption_tri_c, code) %>% 
-  spread(adoption_tri_c, n, fill = 0) %>% 
-  dplyr::select(ID:not) %>% 
-  gather(key, val, -ID, -code) %>% 
-  group_by(code, key) %>% 
-  summarize(mean_val = mean(val)) %>% 
-  spread(key, mean_val) %>% 
-  ungroup() %>% 
-  mutate_if(is.double, round, 2)
-
-# sd
-n_adoption_sd <- dd %>% 
-  filter(!(str_detect(ID, "uc") | str_detect(ID, "qa"))) %>% 
-  count(ID, adoption_tri_c, code) %>% 
-  spread(adoption_tri_c, n, fill = 0) %>% 
-  dplyr::select(ID:not) %>% 
-  gather(key, val, -ID, -code) %>% 
-  group_by(code, key) %>% 
-  summarize(sd_val = sd(val)) %>% 
-  spread(key, sd_val) %>% 
-  ungroup() %>% 
-  mutate_if(is.double, round, 2) %>% 
-  set_names(c("Code", str_c("sd_", names(.[2:5]))))
-
-n_adoption_mean
-n_adoption_sd
 ```
 
 # Length

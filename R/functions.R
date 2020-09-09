@@ -258,7 +258,6 @@ proc_users_data_for_locations <- function(users, l, states) {
   users
 }
 
-
 prepare_for_influence <- function(orig_post, users, edge) {
   
   n_days <- orig_post %>% 
@@ -398,15 +397,9 @@ prepare_coded_threads <- function(coded_threads, influence) {
   coded_threads <- coded_threads %>% 
     mutate(ID = if_else(is.na(ID), str_c("qa-", as.character(row_number())), ID))
   
-  coded_threads %>% 
-    janitor::tabyl(code) %>% 
-    arrange(desc(n))
-  
   tm <-coded_threads %>% 
     janitor::tabyl(code) %>% 
     arrange(desc(n))
-  
-  cst <- chisq.test(tm$n)
   
   coded_threads
 }

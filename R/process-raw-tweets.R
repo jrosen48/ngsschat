@@ -1,5 +1,10 @@
 # process-raw-tweets
 
+get_tweet_id <- function (t) {
+  t <- str_extract(t, "[0-9]{6,}")
+  t
+}
+
 process_raw_tweets <- function(f) {
   # d <- read_csv(f)
   # 
