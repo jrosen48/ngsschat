@@ -1,9 +1,11 @@
 
 process_qual_codes <- function(data, users, dd) {
 
-  du <- filter(data, code == "unclear")
+  data <- readd(all_unfiltered_coded_threads)
+  users <- readd(users)
+  dd <- readd(dd)
   
-  print(du)
+  du <- filter(data, code == "unclear")
   
   duu <- data %>% 
     filter(!(status_id %in% du$status_id),
@@ -21,9 +23,9 @@ process_qual_codes <- function(data, users, dd) {
   
   # dd[2619:nrow(dd), "ID"] <- str_c("uc-", 1:1319)
   
-  dd[2619:nrow(dd), ]
+  # dd[2619:nrow(dd), ]
   
-  d <- d %>% 
+  d <- data %>% 
     filter(!(status_id %in% duu$status_id)) %>% 
     mutate(ID = as.character(as.integer(id_factor))) %>% 
     dplyr::select(-code)

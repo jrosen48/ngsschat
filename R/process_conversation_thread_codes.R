@@ -23,7 +23,7 @@ get_replies_recursive <- function(statuses, existing_data = NULL) {
 
 thread_finder <- function(status_id, d, out_statuses = NULL) {
   
-  status_is_a_reply_to <- as.character(d[d$status_id == status_id, ]$reply_to_status_id)
+  status_is_a_reply_to <- d[d$status_id == status_id, ]$reply_to_status_id
   
   status_is_a_reply_to <- ifelse(length(status_is_a_reply_to) == 0, NA, status_is_a_reply_to)
   
@@ -35,10 +35,11 @@ thread_finder <- function(status_id, d, out_statuses = NULL) {
       out_statuses <- c(out_statuses, status_is_a_reply_to)
     }
     
-    thread_finder(status_is_a_reply_to, d, out_statuses)  
+    thread_finder(status_is_a_reply_to, d, out_statuses)
+    
   } else {
     #out_statuses <- c(out_statuses, status_id)
-    return(out_statuses)
+    return(as.character(out_statuses))
   }
 }
 
@@ -70,9 +71,10 @@ remove_short_threads <- function(thread, d, i) {
 
 process_conversation_thread_codes <- function(d) {
 
+  #d <- drake::readd(orig_all)
   ## ------------------------------------------------------------------------------------------------------------
-  # o <- get_replies_recursive(drake::readd(orig_all)$reply_to_status_id)
-  # write_rds(o, "data/recursively-searched-replies.rds")
+  #o <- get_replies_recursive(drake::readd(orig_all)$reply_to_status_id)
+  #write_rds(o, "data/recursively-searched-replies.rds")
   o <- read_rds("data/recursively-searched-replies.rds")
   #o$status_id <- o$status_url %>% stringr::str_split("/") %>% purrr::map(~.[[6]]) %>% unlist()
   dd <- rbind(d, o)
@@ -93,7 +95,7 @@ process_conversation_thread_codes <- function(d) {
     arrange(desc(created_at))
   
   ## ------------------------------------------------------------------------------------------------------------
-  o <- purrr::map(d1415$status_id, thread_finder, d = dd)
+  o <- purrr::map(d1415$status_id, thread_finder, d = dd) # neither of the inputs have an e
   
   ## ------------------------------------------------------------------------------------------------------------
   dx <- tibble(ID = 1:length(o))
@@ -102,6 +104,10 @@ process_conversation_thread_codes <- function(d) {
   
   dxx <- dx %>% 
     unnest(thread)
+  
+  has_an_e <- dxx$thread %>% str_detect("e") %>% which()
+  
+  dxx <- dxx[-has_an_e, ] # this is removing the 
   
   dxx <- dxx %>% 
     group_by(ID) %>% 

@@ -47,9 +47,8 @@ plan = drake::drake_plan(
   preliminary_results = rmarkdown::render(
     knitr_in("preliminary-results.Rmd"),
     output_file = file_out("docs/preliminary-results.html"),
-    params = list(all_unfiltered_coded_threads = all_unfiltered_coded_threads,
-                  users_to_analyze = users,
-                  influence = influence)),
+    params = list(all_unfiltered_coded_threads = qual_coded_threads,
+                  users_to_analyze = users)),
   
   conversations_rq1 = rmarkdown::render(
     knitr_in("conversations-rq1.Rmd"),

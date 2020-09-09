@@ -1,5 +1,5 @@
 ---
-title: "Selecton Models"
+title: "Selection Models"
 author: "JMR"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: html_document
@@ -11,8 +11,22 @@ params:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
 
-edge <- params$edgelist
-users <- params$users_to_analyze
+library(rtweet)
+library(ggraph)
+library(igraph)
+library(tidygraph)
+library(cowplot)
+library(readxl)
+library(irr)
+library(multcomp)
+library(brms)
+library(tidyverse)
+
+library(conflicted)
+
+conflict_prefer("filter", "dplyr")
+conflict_prefer("gather", "tidyr")
+conflict_prefer("select", "dplyr")
 ```
 
 ```{r}

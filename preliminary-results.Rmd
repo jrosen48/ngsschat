@@ -10,11 +10,23 @@ params:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
-```
 
-```{r}
-d <- params$all_unfiltered_coded_threads
-u <- params$users_to_analyze
+library(rtweet)
+library(ggraph)
+library(igraph)
+library(tidygraph)
+library(cowplot)
+library(readxl)
+library(irr)
+library(multcomp)
+library(brms)
+library(tidyverse)
+
+library(conflicted)
+
+conflict_prefer("filter", "dplyr")
+conflict_prefer("gather", "tidyr")
+conflict_prefer("select", "dplyr")
 ```
 
 ```{r}
@@ -22,9 +34,9 @@ u <- u %>%
   select(-code)
 
 d <- d %>% mutate(screen_name = tolower(screen_name))
+
 dd <- d %>% 
-  left_join(u) %>% 
-  left_join(i)
+  left_join(u)
 
 dd <- dd %>% 
   mutate(group = if_else(is.na(group), "Unclear", group))

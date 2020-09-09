@@ -13,16 +13,29 @@ params:
 ```{r setup, include=FALSE, eval = TRUE}
 knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
 
-raw_qual_coded_data <- params$raw_qual_coded_data
-coded_threads <- params$coded_threads
+library(rtweet)
+library(ggraph)
+library(igraph)
+library(tidygraph)
+library(cowplot)
+library(readxl)
+library(irr)
+library(multcomp)
+library(brms)
+library(tidyverse)
+
+library(conflicted)
+
+conflict_prefer("filter", "dplyr")
+conflict_prefer("gather", "tidyr")
+conflict_prefer("select", "dplyr")
 ```
 
 
 ```{r}
 d <- raw_qual_coded_data %>% slice(201:300)
 d <- d %>% 
-  dplyr::select(JWR = Code, JMR = Notes) %>% 
-  mutate(JWR = if_else(is.na(JWR), "SB", JWR))
+  dplyr::select(JWR = Code, JMR = Notes)
 
 irr::kappa2(d[1:50, ])
 irr::agree(d[1:50, ])
@@ -36,8 +49,13 @@ coded_threads %>% janitor::tabyl(code)
 ```
 
 ```{r}
-coded_threads %>% count(ID) %>% filter(is.na(ID)) 
-qa_rows <- coded_threads %>% filter(is.na(ID)) %>% nrow()
+coded_threads %>% 
+  count(ID) %>% 
+  filter(is.na(ID)) 
+
+qa_rows <- coded_threads %>% 
+  filter(is.na(ID)) %>% 
+  nrow()
 ```
 
 ```{r}
@@ -53,13 +71,6 @@ qa_rows + uc_rows
 ```
 
 ```{r}
-d <- params$all_unfiltered_coded_threads
-u <- params$users_to_analyze
-```
-
-```{r}
-# 11127 tweets in threads; 8,384 unique tweets
-
 u <- u %>% 
   select(-code)
 
@@ -76,17 +87,6 @@ dd <- dd %>%
 
 dd <- dd %>% 
   filter(code != "RT")
-```
-
-# Checking the data
-
-```{r, eval = FALSE}
-sno <- dd %>% 
-  #filter(!(str_detect(ID, "uc") | str_detect(ID, "qa"))) %>% 
-  pull(screen_name) %>% 
-  unique()
-
-i$screen_name %in% sno
 ```
 
 # Freqs
@@ -108,110 +108,4 @@ dd %>%
 dd %>% 
   filter(str_detect(ID, "uc") | str_detect(ID, "qa")) %>% 
   count(str_detect(ID, "uc"))
-```
-
-# N individuals participated
-
-```{r}
-# mean
-n_group_mean <- dd %>% 
-  count(ID, group, code) %>% 
-  spread(group, n, fill = 0) %>% 
-  dplyr::select(ID:Teacher) %>% 
-  gather(key, val, -ID, -code) %>% 
-  group_by(code, key) %>% 
-  summarize(mean_val = mean(val)) %>% 
-  spread(key, mean_val) %>% 
-  ungroup() %>% 
-  arrange(desc(Administrator)) %>% 
-  dplyr::select(Code = code, Teacher, Administrator, Researcher, Organization, Other) %>% 
-  mutate_if(is.double, round, 2)
-
-# sd
-n_group_sd <- dd %>% 
-  count(ID, group, code) %>% 
-  spread(group, n, fill = 0) %>% 
-  dplyr::select(ID:Teacher) %>% 
-  gather(key, val, -ID, -code) %>% 
-  group_by(code, key) %>% 
-  summarize(sd_val = sd(val)) %>% 
-  spread(key, sd_val) %>% 
-  ungroup() %>% 
-  dplyr::select(Code = code, Teacher, Administrator, Researcher, Organization, Other) %>% 
-  mutate_if(is.double, round, 2) %>% 
-  set_names(c("Code", str_c("sd_", names(.[2:6]))))
-
-n_group_mean
-n_group_sd
-```
-
-# Length
-
-```{r}
-dd %>% 
-  filter(!(str_detect(ID, "uc") | str_detect(ID, "qa"))) %>% 
-  count(ID, code) %>% 
-  group_by(code) %>% 
-  summarize(mean_length = mean(n),
-            sd_length = sd(n))
-```
-
-# N participating at least one
-
-```{r}
-one_or_more <- function(x) {
-  sum(if_else(x > 0, 1, 0))
-}
-
-dd %>% 
-  filter(!(str_detect(ID, "uc") | str_detect(ID, "qa"))) %>% 
-  count(screen_name, code) %>% 
-  spread(code, n, fill = 0) %>% 
-  semi_join(i) %>% 
-  summarize_if(is.numeric, one_or_more) %>% 
-  gather(key, val) %>% 
-  mutate(prop = val / 247)
-```
-
-# M individuals participated
-
-```{r}
-dd %>% 
-  filter(!(str_detect(ID, "uc") | str_detect(ID, "qa"))) %>% 
-  count(ID, screen_name, code) %>% 
-  count(ID, screen_name, code) %>% 
-  group_by(ID, code) %>% 
-  summarize(sum_n_groups = sum(n)) %>% 
-  group_by(code) %>% 
-  summarize(mean_n = mean(sum_n_groups),
-            sd_n = sd(sum_n_groups))
-
-```
-
-# M groups
-
-```{r}
-dd %>% 
-  filter(!(str_detect(ID, "uc") | str_detect(ID, "qa"))) %>% 
-  count(ID, group, code) %>% 
-  count(ID, group, code) %>% 
-  group_by(ID, code) %>% 
-  summarize(sum_n_groups = sum(n)) %>% 
-  group_by(code) %>% 
-  summarize(mean_n = mean(sum_n_groups),
-            sd_n = sd(sum_n_groups))
-```
-
-# M adoption statuses
-
-```{r}
-dd %>% 
-  filter(!(str_detect(ID, "uc") | str_detect(ID, "qa"))) %>% 
-  count(ID, adoption_tri, code) %>% 
-  count(ID, adoption_tri, code) %>% 
-  group_by(ID, code) %>% 
-  summarize(sum_n_groups = sum(n)) %>% 
-  group_by(code) %>% 
-  summarize(mean_n = mean(sum_n_groups),
-            sd_n = sd(sum_n_groups))
 ```
